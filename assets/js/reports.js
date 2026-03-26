@@ -239,6 +239,7 @@ class ReportsManager {
         return `
             <div class="report-preview">
                 <div class="text-center mb-4">
+                    <img src="assets/images/Logo.png" alt="ClassWallet Logo" width="80" class="logo-radius mb-3">
                     <h2>ClassWallet Financial Report</h2>
                     <h4>${monthName} ${year}</h4>
                     <p class="text-muted">Generated on ${new Date().toLocaleDateString()}</p>
@@ -324,14 +325,26 @@ class ReportsManager {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
 
-        // Mock PDF generation - in real app, use proper PDF library
-        doc.text('ClassWallet Financial Report', 20, 20);
-        doc.text(`Report Type: ${type}`, 20, 40);
-        doc.text(`Period: ${month}`, 20, 50);
+        try {
+            // Add Logo to PDF header
+            doc.addImage('assets/images/Logo.png', 'PNG', 15, 10, 22, 22);
+            
+            doc.setFontSize(20);
+            doc.setTextColor(40, 40, 40);
+            doc.text('ClassWallet Financial Report', 42, 20);
+            
+            doc.setFontSize(12);
+            doc.text(`Report Type: ${this.getReportTypeName(type)}`, 42, 28);
+            doc.text(`Period: ${month}`, 42, 35);
 
-        // Add more content based on type
-        doc.text('This is a sample PDF report.', 20, 70);
-        doc.text('In a real implementation, this would contain detailed financial data.', 20, 80);
+            doc.setLineWidth(0.5);
+            doc.line(15, 40, 195, 40);
+
+            doc.text('Summary of financial activities and student payment statuses.', 20, 50);
+        } catch (e) {
+            console.warn('Logo could not be loaded into PDF:', e);
+            doc.text('ClassWallet Financial Report', 20, 20);
+        }
 
         // Save the PDF
         const fileName = `ClassWallet_Report_${month}.pdf`;

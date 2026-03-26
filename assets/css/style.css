@@ -19,6 +19,10 @@ body {
     font-weight: 600;
 }
 
+.logo-radius {
+    border-radius: 8px;
+}
+
 .card {
     border: none;
     border-radius: 10px;

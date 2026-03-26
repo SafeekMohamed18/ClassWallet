@@ -36,6 +36,8 @@ classWallet/
 ├── assets/
 │   ├── css/
 │   │   └── style.css       # Custom styles
+│   ├── images/
+│   │   └── Logo.png        # Application Logo
 │   └── js/
 │       ├── auth.js         # Authentication management
 │       ├── dashboard.js    # Dashboard functionality
