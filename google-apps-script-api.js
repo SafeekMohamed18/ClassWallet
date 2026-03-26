@@ -54,7 +54,7 @@ function getStudents() {
       email: row[3] || '',
       address: row[4] || '',
       guardian: row[5] || '',
-      birthday: row[6] ? row[6].toISOString().split('T')[0] : '',
+      birthday: (row[6] instanceof Date) ? row[6].toISOString().split('T')[0] : '',
       notes: row[7] || '',
       paymentStatus: 'unpaid' // This would be calculated based on transactions
     }));
@@ -159,7 +159,7 @@ function getTransactions() {
       description: row[3] || '',
       student: row[4] || null,
       addedBy: row[5] || '',
-      date: row[6] ? row[6].toISOString() : new Date().toISOString()
+      date: (row[6] instanceof Date) ? row[6].toISOString() : new Date().toISOString()
     }));
 
     return ContentService

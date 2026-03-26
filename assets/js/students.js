@@ -55,7 +55,7 @@ class StudentsManager {
             this.renderStudents();
         } catch (error) {
             console.error('Error loading students:', error);
-            this.showError('Failed to load students');
+            this.showError('Failed to load students: ' + error.message);
         }
     }
 
