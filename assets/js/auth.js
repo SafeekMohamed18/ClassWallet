@@ -4,32 +4,25 @@ class AuthManager {
         this.currentUser = null;
         this.allowedEmails = [
             'ut03211tic@gmail.com', // Replace with actual admin emails
-            'committee1@university.edu',
-            'committee2@university.edu'
+            'committee1@university.edu'
             // Add more approved emails here
         ];
         this.init();
     }
 
     init() {
-        // Initialize Google Sign-In
-        google.accounts.id.initialize({
-            client_id: 'YOUR_GOOGLE_CLIENT_ID_HERE', // Replace with your actual Google OAuth client ID
-            callback: this.handleCredentialResponse.bind(this),
-            auto_select: false,
-            cancel_on_tap_outside: true
-        });
-
-        // Render sign-in button
-        google.accounts.id.renderButton(
-            document.getElementById('signin-btn'),
-            {
-                theme: 'outline',
-                size: 'medium',
-                text: 'signin_with',
-                shape: 'rectangular'
-            }
-        );
+        // Check if the Google library is ready; if not, wait for it.
+        if (typeof google !== 'undefined' && google.accounts) {
+            this.setupGoogleAuth();
+        } else {
+            // Fallback: poll until the script is loaded
+            const checkLibrary = setInterval(() => {
+                if (typeof google !== 'undefined' && google.accounts) {
+                    clearInterval(checkLibrary);
+                    this.setupGoogleAuth();
+                }
+            }, 100);
+        }
 
         // Check if user is already signed in
         this.checkExistingSession();
@@ -40,17 +33,43 @@ class AuthManager {
         });
     }
 
+    setupGoogleAuth() {
+        const btnContainer = document.getElementById('signin-btn');
+        if (!btnContainer) return;
+
+        google.accounts.id.initialize({
+            client_id: '741095786970-egvfvg4cdlsurkfsfavt02qadt2dprjg.apps.googleusercontent.com',
+            callback: this.handleCredentialResponse.bind(this),
+            auto_select: false,
+            cancel_on_tap_outside: true
+        });
+
+        google.accounts.id.renderButton(
+            btnContainer,
+            {
+                theme: 'outline',
+                size: 'medium',
+                text: 'signin_with',
+                shape: 'rectangular'
+            }
+        );
+    }
+
     handleCredentialResponse(response) {
         const responsePayload = this.decodeJwtResponse(response.credential);
-        this.currentUser = {
-            email: responsePayload.email,
-            name: responsePayload.name,
-            picture: responsePayload.picture,
-            isAdmin: this.isAdmin(responsePayload.email)
-        };
-
-        this.updateUI();
-        this.saveSession();
+        
+        if (this.isAllowed(responsePayload.email)) {
+            this.currentUser = {
+                email: responsePayload.email,
+                name: responsePayload.name,
+                picture: responsePayload.picture,
+                isAdmin: this.isAdmin(responsePayload.email)
+            };
+            this.updateUI();
+            this.saveSession();
+        } else {
+            this.showError('Access Denied: This email is not authorized.');
+        }
     }
 
     decodeJwtResponse(token) {
