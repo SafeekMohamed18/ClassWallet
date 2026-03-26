@@ -1,0 +1,29 @@
+{
+  "name": "classwallet",
+  "version": "1.0.0",
+  "description": "A web-based financial and student management system for university classes",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server . -p 8000",
+    "dev": "npx http-server . -p 8000 -o",
+    "build": "echo 'No build step required for this frontend-only application'"
+  },
+  "keywords": [
+    "finance",
+    "student-management",
+    "university",
+    "google-sheets",
+    "web-app"
+  ],
+  "author": "ClassWallet Team",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/classwallet.git"
+  },
+  "homepage": "https://yourusername.github.io/classwallet"
+}
