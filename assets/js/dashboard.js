@@ -1,4 +1,6 @@
 // ClassWallet Dashboard Module
+const API_URL = 'https://script.google.com/macros/s/AKfycbzIduTUyGh6YyYQyB7sp0P1XepEFrXGaP5D0l2-XCgRKX6Q4k2PVRYpDFSVlRqrc52w/exec';
+
 class DashboardManager {
     constructor() {
         this.chart = null;
@@ -42,50 +44,25 @@ class DashboardManager {
     }
 
     async fetchSummaryData() {
-        // Mock data - replace with actual API call to Google Sheets
-        return {
-            totalBalance: 2500.00,
-            monthlyIncome: 1200.00,
-            monthlyExpenses: 450.00,
-            paidStudents: 28,
-            totalStudents: 35
-        };
+        const response = await fetch(`${API_URL}?action=getDashboardData`);
+        const result = await response.json();
+        if (!result.success) throw new Error(result.error);
+        return result.data;
     }
 
     async fetchChartData() {
-        // Mock data - replace with actual API call
-        return {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-            income: [1000, 1100, 1200, 1150, 1300, 1200],
-            expenses: [400, 350, 450, 500, 425, 450]
-        };
+        // Fetching chart data from the dashboard endpoint
+        const response = await fetch(`${API_URL}?action=getDashboardData`);
+        const result = await response.json();
+        if (!result.success) throw new Error(result.error);
+        return result.data.chartData || { labels: [], income: [], expenses: [] };
     }
 
     async fetchRecentTransactions() {
-        // Mock data - replace with actual API call
-        return [
-            {
-                date: '2024-01-15',
-                type: 'Income',
-                description: 'Monthly fund collection - January',
-                amount: 1200.00,
-                addedBy: 'admin@university.edu'
-            },
-            {
-                date: '2024-01-14',
-                type: 'Expense',
-                description: 'Class outing expenses',
-                amount: -150.00,
-                addedBy: 'committee1@university.edu'
-            },
-            {
-                date: '2024-01-13',
-                type: 'Income',
-                description: 'Late payment - December',
-                amount: 50.00,
-                addedBy: 'admin@university.edu'
-            }
-        ];
+        const response = await fetch(`${API_URL}?action=getTransactions`);
+        const result = await response.json();
+        if (!result.success) throw new Error(result.error);
+        return result.data.slice(0, 5); // Return only latest 5
     }
 
     updateSummaryCards(data) {
@@ -182,14 +159,10 @@ class DashboardManager {
     }
 
     async fetchMonthlyOverview(month) {
-        // Mock data - replace with actual API call
-        return {
-            paidStudents: month === 'current' ? 28 : 32,
-            totalStudents: 35,
-            pendingPayments: month === 'current' ? 7 : 3,
-            totalIncome: month === 'current' ? 1200 : 1350,
-            totalExpenses: month === 'current' ? 450 : 520
-        };
+        const response = await fetch(`${API_URL}?action=getDashboardData&month=${month}`);
+        const result = await response.json();
+        if (!result.success) throw new Error(result.error);
+        return result.data;
     }
 
     updateMonthlyOverview(data) {

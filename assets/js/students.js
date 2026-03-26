@@ -1,4 +1,6 @@
 // ClassWallet Students Management Module
+const API_URL = 'https://script.google.com/macros/s/AKfycbzIduTUyGh6YyYQyB7sp0P1XepEFrXGaP5D0l2-XCgRKX6Q4k2PVRYpDFSVlRqrc52w/exec';
+
 class StudentsManager {
     constructor() {
         this.students = [];
@@ -58,45 +60,10 @@ class StudentsManager {
     }
 
     async fetchStudents() {
-        // Mock data - replace with actual API call
-        return [
-            {
-                id: 1,
-                regNo: 'CS001',
-                name: 'Ahmad bin Abdullah',
-                mobile: '+60123456789',
-                email: 'ahmad@university.edu',
-                address: '123 Jalan Bukit, Kuala Lumpur',
-                guardian: 'Fatimah Abdullah',
-                birthday: '2000-05-15',
-                notes: 'Malay, Active in sports',
-                paymentStatus: 'paid'
-            },
-            {
-                id: 2,
-                regNo: 'CS002',
-                name: 'Siti Nurhaliza',
-                mobile: '+60198765432',
-                email: 'siti@university.edu',
-                address: '456 Jalan Merdeka, Selangor',
-                guardian: 'Mohd Nurhaliza',
-                birthday: '2001-03-22',
-                notes: 'Malay, Excellent student',
-                paymentStatus: 'unpaid'
-            },
-            {
-                id: 3,
-                regNo: 'CS003',
-                name: 'Raj Kumar',
-                mobile: '+60134567890',
-                email: 'raj@university.edu',
-                address: '789 Jalan Tun Razak, Penang',
-                guardian: 'Priya Kumar',
-                birthday: '1999-12-10',
-                notes: 'Indian, Debate club member',
-                paymentStatus: 'paid'
-            }
-        ];
+        const response = await fetch(`${API_URL}?action=getStudents`);
+        const result = await response.json();
+        if (!result.success) throw new Error(result.error);
+        return result.data;
     }
 
     filterStudents() {
@@ -297,20 +264,37 @@ Payment Status: ${student.paymentStatus}`);
 
     // Mock API methods - replace with actual Google Apps Script calls
     async saveStudentToAPI(data) {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 500));
-        return {
-            id: Date.now(), // Simple ID generation
-            ...data
-        };
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            mode: 'no-cors', // Use no-cors if experiencing redirect issues with GAS
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'addStudent', student: data })
+        });
+        // Note: With no-cors, you won't be able to read the response body. 
+        // For full CRUD reliability, ensure doOptions() is configured in GAS.
+        return { id: Date.now(), ...data }; 
     }
 
     async updateStudentInAPI(id, data) {
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                action: 'updateStudent', 
+                student: { ...data, id: id } 
+            })
+        });
     }
 
     async deleteStudentFromAPI(id) {
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                action: 'deleteStudent', 
+                studentId: id 
+            })
+        });
     }
 
     showSuccess(message) {

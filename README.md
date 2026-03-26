@@ -93,6 +93,15 @@ ID | Type | Amount | Description | Student | Added By | Date
 5. Add your domain to authorized origins
 6. Copy the Client ID
 
+### 5. Troubleshooting "App Not Verified"
+During authorization, you may see a screen saying "Google hasn't verified this app."
+1. **To bypass**: Click **Advanced** > **Go to ClassWallet (unsafe)**.
+2. **To allow other users**:
+   - Go to [Google Cloud Console](https://console.cloud.google.com/)
+   - Navigate to **APIs & Services** > **OAuth consent screen**
+   - Add the user's email to the **Test users** section.
+   - Ensure the Publishing Status is set to "Testing" (or "In Production" for internal use).
+
 ## Usage
 
 ### First Time Setup

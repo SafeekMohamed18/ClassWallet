@@ -1,4 +1,6 @@
 // ClassWallet Funds Management Module
+const API_URL = 'https://script.google.com/macros/s/AKfycbzIduTUyGh6YyYQyB7sp0P1XepEFrXGaP5D0l2-XCgRKX6Q4k2PVRYpDFSVlRqrc52w/exec';
+
 class FundsManager {
     constructor() {
         this.transactions = [];
@@ -63,45 +65,15 @@ class FundsManager {
     }
 
     async fetchStudents() {
-        // Mock data - replace with actual API call
-        return [
-            { id: 1, name: 'Ahmad bin Abdullah', regNo: 'CS001' },
-            { id: 2, name: 'Siti Nurhaliza', regNo: 'CS002' },
-            { id: 3, name: 'Raj Kumar', regNo: 'CS003' }
-        ];
+        const response = await fetch(`${API_URL}?action=getStudents`);
+        const result = await response.json();
+        return result.data || [];
     }
 
     async fetchTransactions() {
-        // Mock data - replace with actual API call
-        return [
-            {
-                id: 1,
-                type: 'Income',
-                amount: 1200.00,
-                description: 'Monthly fund collection - January',
-                student: null,
-                addedBy: 'admin@university.edu',
-                date: '2024-01-15T10:30:00Z'
-            },
-            {
-                id: 2,
-                type: 'Expense',
-                amount: -150.00,
-                description: 'Class outing expenses',
-                student: null,
-                addedBy: 'committee1@university.edu',
-                date: '2024-01-14T14:20:00Z'
-            },
-            {
-                id: 3,
-                type: 'Income',
-                amount: 50.00,
-                description: 'Late payment - December',
-                student: 'Ahmad bin Abdullah',
-                addedBy: 'admin@university.edu',
-                date: '2024-01-13T09:15:00Z'
-            }
-        ];
+        const response = await fetch(`${API_URL}?action=getTransactions`);
+        const result = await response.json();
+        return result.data || [];
     }
 
     populateStudentDropdown() {
@@ -275,16 +247,24 @@ class FundsManager {
 
     // Mock API methods - replace with actual Google Apps Script calls
     async saveTransactionToAPI(data) {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 500));
-        return {
-            id: Date.now(), // Simple ID generation
-            ...data
-        };
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'addTransaction', transaction: data })
+        });
+        const result = await response.json();
+        if (!result.success) throw new Error(result.error);
+        return { id: Date.now(), ...data };
     }
 
     async deleteTransactionFromAPI(id) {
-        await new Promise(resolve => setTimeout(resolve, 500));
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'deleteTransaction', transactionId: id })
+        });
+        const result = await response.json();
+        if (!result.success) throw new Error(result.error);
     }
 
     formatDate(dateString) {

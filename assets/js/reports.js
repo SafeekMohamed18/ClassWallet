@@ -1,4 +1,6 @@
 // ClassWallet Reports Module
+const API_URL = 'https://script.google.com/macros/s/AKfycbzIduTUyGh6YyYQyB7sp0P1XepEFrXGaP5D0l2-XCgRKX6Q4k2PVRYpDFSVlRqrc52w/exec';
+
 class ReportsManager {
     constructor() {
         this.incomeChart = null;
@@ -57,13 +59,10 @@ class ReportsManager {
     }
 
     async fetchStats() {
-        // Mock data - replace with actual API call
-        return {
-            totalStudents: 35,
-            paidThisMonth: 28,
-            currentBalance: 2500.00,
-            monthlyIncome: 1200.00
-        };
+        const response = await fetch(`${API_URL}?action=getDashboardData`);
+        const result = await response.json();
+        if (!result.success) throw new Error(result.error);
+        return result.data;
     }
 
     async fetchChartData() {
