@@ -10,8 +10,19 @@ class ReportsManager {
     }
 
     init() {
+        this.setDefaultMonth();
         this.loadReportData();
         this.setupEventListeners();
+    }
+
+    setDefaultMonth() {
+        const monthInput = document.getElementById('report-month');
+        if (monthInput) {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            monthInput.value = `${year}-${month}`;
+        }
     }
 
     setupEventListeners() {
