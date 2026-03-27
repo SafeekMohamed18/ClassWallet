@@ -191,7 +191,6 @@ class FundsManager {
             amount: amount,
             description: description,
             student: studentRegNo,
-            date: new Date(date).toISOString(),
             date: transactionDate.toISOString(),
             addedBy: window.authManager.getCurrentUser().email
         };
@@ -252,7 +251,6 @@ class FundsManager {
             amount: -amount, // Negative for expenses
             description: description,
             student: null,
-            date: new Date(date).toISOString(),
             date: transactionDate.toISOString(),
             addedBy: window.authManager.getCurrentUser().email
         };
