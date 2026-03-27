@@ -3,9 +3,9 @@ class AuthManager {
     constructor() {
         this.currentUser = null;
         this.allowedEmails = [
-            'ut03211tic@gmail.com', // Replace with actual admin emails
-            'mohamedsafeek0618@gmail.com'
-            // Add more approved emails here
+            'ut03211tic@gmail.com',
+            'mohamedsafeek0618@gmail.com',
+            'bweerasinghe2004@gmail.com' // <-- ADD NEW MEMBER EMAILS HERE
         ];
         this.init();
     }
