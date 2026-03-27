@@ -7,7 +7,7 @@ class AuthManager {
             'mohamedsafeek0618@gmail.com',
             'bweerasinghe2004@gmail.com',
             'hapugodasanjana@gmail.com',
-            'Oshani2003u@gmail.com',
+            'oshani2003u@gmail.com',
             'skkuruwita@gmail.com',
             'samarasinghebhagya123@gmail.com',
             'suranthadarshana6@gmail.com',
