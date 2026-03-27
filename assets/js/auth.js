@@ -5,7 +5,8 @@ class AuthManager {
         this.allowedEmails = [
             'ut03211tic@gmail.com',
             'mohamedsafeek0618@gmail.com',
-            'bweerasinghe2004@gmail.com' // <-- ADD NEW MEMBER EMAILS HERE
+            'bweerasinghe2004@gmail.com',
+            'hapugodasanjana@gmail.com' // <-- ADD NEW MEMBER EMAILS HERE
         ];
         this.init();
     }
