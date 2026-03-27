@@ -1,5 +1,5 @@
 // ClassWallet Dashboard Module
-const API_URL = 'https://script.google.com/macros/s/AKfycbyOqPp7p56EW-5wR3rGWPAOrelCJIxVfvrrdENTHL8mFOLzk_KWwGRh_sib0jYPKVw/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbyXHY2enlHchXs9NyWZDEQRfqGo7pHAvrZ2P39t8spnPSn6EuXI3NGaiJCJOIrYw4KX/exec';
 
 class DashboardManager {
     constructor() {
