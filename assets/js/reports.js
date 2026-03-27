@@ -221,27 +221,30 @@ class ReportsManager {
         const reportType = document.getElementById('report-type').value;
         const reportMonth = document.getElementById('report-month').value;
 
+        const generateBtn = document.getElementById('generate-report-btn');
+        const originalText = generateBtn ? generateBtn.innerHTML : '';
+
         try {
             // Show loading
-            const generateBtn = document.getElementById('generate-report-btn');
-            const originalText = generateBtn.innerHTML;
-            generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Generating...';
-            generateBtn.disabled = true;
+            if (generateBtn) {
+                generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Generating...';
+                generateBtn.disabled = true;
+            }
 
             // Mock report generation delay
             await new Promise(resolve => setTimeout(resolve, 2000));
 
             // Generate PDF
             await this.createPDF(reportType, reportMonth);
-
-            // Reset button
-            generateBtn.innerHTML = originalText;
-            generateBtn.disabled = false;
-
             this.showSuccess('Report generated successfully');
         } catch (error) {
             console.error('Error generating report:', error);
             this.showError('Failed to generate report');
+        } finally {
+            if (generateBtn) {
+                generateBtn.innerHTML = originalText;
+                generateBtn.disabled = false;
+            }
         }
     }
 
@@ -370,12 +373,15 @@ class ReportsManager {
         const [year, monthNum] = month.split('-');
         const monthName = new Date(year, monthNum - 1).toLocaleString('default', { month: 'long' });
 
+        const downloadBtn = document.getElementById('download-pdf-btn');
+        const originalText = downloadBtn ? downloadBtn.innerHTML : '';
+
         try {
             // Show loading state on button
-            const downloadBtn = document.getElementById('download-pdf-btn');
-            const originalText = downloadBtn.innerHTML;
-            downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Preparing PDF...';
-            downloadBtn.disabled = true;
+            if (downloadBtn) {
+                downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Preparing PDF...';
+                downloadBtn.disabled = true;
+            }
 
             // Fetch real data
             const [txRes, statRes] = await Promise.all([
@@ -510,17 +516,12 @@ class ReportsManager {
             };
             this.reports.unshift(newReport);
             this.renderRecentReports();
-
-            // Reset button
-            downloadBtn.innerHTML = originalText;
-            downloadBtn.disabled = false;
-
         } catch (error) {
             console.error('Error creating PDF:', error);
             this.showError('Failed to generate PDF');
-            const downloadBtn = document.getElementById('download-pdf-btn');
+        } finally {
             if (downloadBtn) {
-                downloadBtn.innerHTML = '<i class="fas fa-download me-1"></i>Download PDF';
+                downloadBtn.innerHTML = originalText;
                 downloadBtn.disabled = false;
             }
         }

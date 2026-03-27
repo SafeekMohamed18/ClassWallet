@@ -12,6 +12,18 @@ class FundsManager {
     init() {
         this.loadData();
         this.setupEventListeners();
+        this.setDefaultDates();
+    }
+
+    setDefaultDates() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const today = `${year}-${month}-${day}`;
+
+        if (document.getElementById('income-date')) document.getElementById('income-date').value = today;
+        if (document.getElementById('expense-date')) document.getElementById('expense-date').value = today;
     }
 
     setupEventListeners() {
@@ -152,6 +164,9 @@ class FundsManager {
             return;
         }
 
+        const saveBtn = document.getElementById('save-income-btn');
+        const originalBtnHtml = saveBtn.innerHTML;
+
         const amount = parseFloat(document.getElementById('income-amount').value);
         const description = document.getElementById('income-description').value;
         const studentId = document.getElementById('income-student').value;
@@ -159,16 +174,32 @@ class FundsManager {
 
         const studentRegNo = studentId ? this.students.find(s => s.id == studentId)?.regNo : null;
 
+        // Combine selected date with current system time to avoid the "5:30 AM" issue
+        const now = new Date();
+        const dateParts = date.split('-');
+        const transactionDate = new Date(
+            dateParts[0], 
+            dateParts[1] - 1, 
+            dateParts[2], 
+            now.getHours(), 
+            now.getMinutes(), 
+            now.getSeconds()
+        );
+
         const transactionData = {
             type: 'Income',
             amount: amount,
             description: description,
             student: studentRegNo,
             date: new Date(date).toISOString(),
+            date: transactionDate.toISOString(),
             addedBy: window.authManager.getCurrentUser().email
         };
 
         try {
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Saving...';
+
             // Mock API call - replace with actual save to Google Sheets
             const newTransaction = await this.saveTransactionToAPI(transactionData);
             this.transactions.unshift(newTransaction); // Add to beginning
@@ -178,11 +209,15 @@ class FundsManager {
             // Close modal and reset form
             bootstrap.Modal.getInstance(document.getElementById('addIncomeModal')).hide();
             form.reset();
+            this.setDefaultDates();
 
             this.showSuccess('Income recorded successfully');
         } catch (error) {
             console.error('Error saving income:', error);
             this.showError('Failed to save income');
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = originalBtnHtml;
         }
     }
 
@@ -193,9 +228,24 @@ class FundsManager {
             return;
         }
 
+        const saveBtn = document.getElementById('save-expense-btn');
+        const originalBtnHtml = saveBtn.innerHTML;
+
         const amount = parseFloat(document.getElementById('expense-amount').value);
         const description = document.getElementById('expense-description').value;
         const date = document.getElementById('expense-date').value;
+
+        // Combine selected date with current system time to avoid the "5:30 AM" issue
+        const now = new Date();
+        const dateParts = date.split('-');
+        const transactionDate = new Date(
+            dateParts[0], 
+            dateParts[1] - 1, 
+            dateParts[2], 
+            now.getHours(), 
+            now.getMinutes(), 
+            now.getSeconds()
+        );
 
         const transactionData = {
             type: 'Expense',
@@ -203,10 +253,14 @@ class FundsManager {
             description: description,
             student: null,
             date: new Date(date).toISOString(),
+            date: transactionDate.toISOString(),
             addedBy: window.authManager.getCurrentUser().email
         };
 
         try {
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Saving...';
+
             // Mock API call - replace with actual save to Google Sheets
             const newTransaction = await this.saveTransactionToAPI(transactionData);
             this.transactions.unshift(newTransaction); // Add to beginning
@@ -216,11 +270,15 @@ class FundsManager {
             // Close modal and reset form
             bootstrap.Modal.getInstance(document.getElementById('addExpenseModal')).hide();
             form.reset();
+            this.setDefaultDates();
 
             this.showSuccess('Expense recorded successfully');
         } catch (error) {
             console.error('Error saving expense:', error);
             this.showError('Failed to save expense');
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = originalBtnHtml;
         }
     }
 

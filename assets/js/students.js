@@ -163,6 +163,9 @@ Notes: ${student.notes || 'N/A'}`);
             return;
         }
 
+        const saveBtn = document.getElementById('save-student-btn');
+        const originalBtnHtml = saveBtn.innerHTML;
+
         const studentData = {
             regNo: document.getElementById('reg-no').value,
             name: document.getElementById('full-name').value,
@@ -178,6 +181,9 @@ Notes: ${student.notes || 'N/A'}`);
         };
 
         try {
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Saving...';
+
             // Mock API call - replace with actual save to Google Sheets
             const newStudent = await this.saveStudentToAPI(studentData);
             this.students.push(newStudent);
@@ -192,6 +198,9 @@ Notes: ${student.notes || 'N/A'}`);
         } catch (error) {
             console.error('Error saving student:', error);
             this.showError('Failed to save student');
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = originalBtnHtml;
         }
     }
 
@@ -201,6 +210,9 @@ Notes: ${student.notes || 'N/A'}`);
             form.reportValidity();
             return;
         }
+
+        const updateBtn = document.getElementById('update-student-btn');
+        const originalBtnHtml = updateBtn.innerHTML;
 
         const id = parseInt(document.getElementById('edit-student-id').value);
         const studentData = {
@@ -217,6 +229,9 @@ Notes: ${student.notes || 'N/A'}`);
         };
 
         try {
+            updateBtn.disabled = true;
+            updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Updating...';
+
             // Mock API call - replace with actual update to Google Sheets
             await this.updateStudentInAPI(id, studentData);
 
@@ -235,6 +250,9 @@ Notes: ${student.notes || 'N/A'}`);
         } catch (error) {
             console.error('Error updating student:', error);
             this.showError('Failed to update student');
+        } finally {
+            updateBtn.disabled = false;
+            updateBtn.innerHTML = originalBtnHtml;
         }
     }
 
