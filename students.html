@@ -152,17 +152,34 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="guardian" class="form-label">Guardian Details</label>
-                                <input type="text" class="form-control" id="guardian">
+                                <label for="guardian-name" class="form-label">Guardian Name</label>
+                                <input type="text" class="form-control" id="guardian-name">
                             </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="guardian-mobile" class="form-label">Guardian Mobile Number</label>
+                                <input type="tel" class="form-control" id="guardian-mobile">
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="birthday" class="form-label">Birthday</label>
                                 <input type="date" class="form-control" id="birthday">
                             </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="race" class="form-label">Race</label>
+                                <select class="form-select" id="race">
+                                    <option value="">Select...</option>
+                                    <option value="Hindu">Hindu</option>
+                                    <option value="Buddhist">Buddhist</option>
+                                    <option value="Muslim">Muslim</option>
+                                    <option value="Christian">Christian</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="notes" class="form-label">Additional Notes</label>
-                            <textarea class="form-control" id="notes" rows="2" placeholder="Race, additional info, etc."></textarea>
+                            <textarea class="form-control" id="notes" rows="2" placeholder="Additional info, etc."></textarea>
                         </div>
                     </form>
                 </div>
@@ -211,17 +228,34 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="edit-guardian" class="form-label">Guardian Details</label>
-                                <input type="text" class="form-control" id="edit-guardian">
+                                <label for="edit-guardian-name" class="form-label">Guardian Name</label>
+                                <input type="text" class="form-control" id="edit-guardian-name">
                             </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="edit-guardian-mobile" class="form-label">Guardian Mobile Number</label>
+                                <input type="tel" class="form-control" id="edit-guardian-mobile">
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="edit-birthday" class="form-label">Birthday</label>
                                 <input type="date" class="form-control" id="edit-birthday">
                             </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="edit-race" class="form-label">Race</label>
+                                <select class="form-select" id="edit-race">
+                                    <option value="">Select...</option>
+                                    <option value="Hindu">Hindu</option>
+                                    <option value="Buddhist">Buddhist</option>
+                                    <option value="Muslim">Muslim</option>
+                                    <option value="Christian">Christian</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="edit-notes" class="form-label">Additional Notes</label>
-                            <textarea class="form-control" id="edit-notes" rows="2" placeholder="Race, additional info, etc."></textarea>
+                            <textarea class="form-control" id="edit-notes" rows="2" placeholder="Additional info, etc."></textarea>
                         </div>
                     </form>
                 </div>

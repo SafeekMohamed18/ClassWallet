@@ -1,5 +1,5 @@
 // ClassWallet Dashboard Module
-const API_URL = 'https://script.google.com/macros/s/AKfycbyXHY2enlHchXs9NyWZDEQRfqGo7pHAvrZ2P39t8spnPSn6EuXI3NGaiJCJOIrYw4KX/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbxBaxAjIgJ-eR4AIvl62IygkwYCWn7381ls241bv08B_PWpvvwX3UpG26A0c47yJ9Wh/exec';
 
 class DashboardManager {
     constructor() {
@@ -153,8 +153,8 @@ class DashboardManager {
             const overview = await this.fetchMonthlyOverview(selectedMonth);
             this.updateMonthlyOverview(overview);
         } catch (error) {
-            console.error('Error loading monthly overview:', error);
-            this.showError('Failed to load monthly overview');
+            console.error('Detailed error loading monthly overview:', error);
+            this.showError('Failed to load monthly overview: ' + error.message);
         }
     }
 

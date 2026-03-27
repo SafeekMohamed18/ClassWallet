@@ -1,5 +1,5 @@
 // ClassWallet Reports Module
-const API_URL = 'https://script.google.com/macros/s/AKfycbyXHY2enlHchXs9NyWZDEQRfqGo7pHAvrZ2P39t8spnPSn6EuXI3NGaiJCJOIrYw4KX/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbxBaxAjIgJ-eR4AIvl62IygkwYCWn7381ls241bv08B_PWpvvwX3UpG26A0c47yJ9Wh/exec';
 
 class ReportsManager {
     constructor() {
@@ -66,24 +66,41 @@ class ReportsManager {
     }
 
     async fetchChartData() {
-        // Mock data - replace with actual API call
+        const response = await fetch(`${API_URL}?action=getTransactions`);
+        const result = await response.json();
+        const transactions = result.success ? result.data : [];
+        
+        const incomeMap = {};
+        const expenseMap = {};
+        
+        transactions.forEach(t => {
+            const amount = parseFloat(t.amount) || 0;
+            const desc = t.description || 'Other';
+            
+            if (t.type === 'Income') {
+                incomeMap[desc] = (incomeMap[desc] || 0) + amount;
+            } else {
+                expenseMap[desc] = (expenseMap[desc] || 0) + Math.abs(amount);
+            }
+        });
+        
         return {
             incomeBreakdown: {
-                labels: ['Monthly Collection', 'Late Payments', 'Other'],
-                data: [1000, 150, 50]
+                labels: Object.keys(incomeMap).length ? Object.keys(incomeMap) : ['No Data'],
+                data: Object.values(incomeMap).length ? Object.values(incomeMap) : [1]
             },
             expenseCategories: {
-                labels: ['Class Outing', 'Stationery', 'Events', 'Other'],
-                data: [400, 150, 200, 100]
+                labels: Object.keys(expenseMap).length ? Object.keys(expenseMap) : ['No Data'],
+                data: Object.values(expenseMap).length ? Object.values(expenseMap) : [1]
             }
         };
     }
 
     updateStats(stats) {
-        document.getElementById('total-students').textContent = stats.totalStudents;
-        document.getElementById('paid-this-month').textContent = stats.paidThisMonth;
-        document.getElementById('current-balance').textContent = `Rs ${stats.currentBalance.toFixed(2)}`;
-        document.getElementById('monthly-income-stat').textContent = `Rs ${stats.monthlyIncome.toFixed(2)}`;
+        document.getElementById('total-students').textContent = stats.totalStudents || 0;
+        document.getElementById('paid-this-month').textContent = stats.paidStudents || 0;
+        document.getElementById('current-balance').textContent = `Rs ${(stats.totalBalance || 0).toFixed(2)}`;
+        document.getElementById('monthly-income-stat').textContent = `Rs ${(stats.monthlyIncome || 0).toFixed(2)}`;
     }
 
     updateCharts(data) {
@@ -231,9 +248,32 @@ class ReportsManager {
     }
 
     async generateReportPreview(type, month) {
-        // Mock report preview HTML
         const [year, monthNum] = month.split('-');
         const monthName = new Date(year, monthNum - 1).toLocaleString('default', { month: 'long' });
+
+        // Fetch real data
+        const txResponse = await fetch(`${API_URL}?action=getTransactions`);
+        const txResult = await txResponse.json();
+        const transactions = txResult.success ? txResult.data : [];
+
+        const statResponse = await fetch(`${API_URL}?action=getDashboardData`);
+        const statResult = await statResponse.json();
+        const stats = statResult.success ? statResult.data : { totalStudents: 0, paidStudents: 0, totalBalance: 0, monthlyIncome: 0, monthlyExpenses: 0 };
+        
+        // Filter transactions for the selected month
+        const monthTx = transactions.filter(t => {
+            const d = new Date(t.date);
+            return d.getFullYear() === parseInt(year) && (d.getMonth() + 1) === parseInt(monthNum);
+        });
+        
+        const incomeTx = monthTx.filter(t => t.type === 'Income');
+        const expenseTx = monthTx.filter(t => t.type !== 'Income');
+        
+        let incomeRows = incomeTx.map(t => `<tr><td>${t.date.split('T')[0]}</td><td>${t.description}</td><td class="text-success">+Rs ${Math.abs(t.amount).toFixed(2)}</td></tr>`).join('');
+        if (!incomeRows) incomeRows = '<tr><td colspan="3" class="text-center text-muted">No income recorded</td></tr>';
+        
+        let expenseRows = expenseTx.map(t => `<tr><td>${t.date.split('T')[0]}</td><td>${t.description}</td><td class="text-danger">-Rs ${Math.abs(t.amount).toFixed(2)}</td></tr>`).join('');
+        if (!expenseRows) expenseRows = '<tr><td colspan="3" class="text-center text-muted">No expenses recorded</td></tr>';
 
         return `
             <div class="report-preview">
@@ -248,26 +288,24 @@ class ReportsManager {
                     <div class="col-md-6">
                         <h5>Summary</h5>
                         <table class="table table-sm">
-                            <tr><td>Total Students:</td><td>35</td></tr>
-                            <tr><td>Paid Students:</td><td>28</td></tr>
-                            <tr><td>Unpaid Students:</td><td>7</td></tr>
-                            <tr><td>Payment Rate:</td><td>80%</td></tr>
+                            <tr><td>Total Students:</td><td>${stats.totalStudents || 0}</td></tr>
+                            <tr><td>Paid Students:</td><td>${stats.paidStudents || 0}</td></tr>
+                            <tr><td>Unpaid Students:</td><td>${(stats.totalStudents || 0) - (stats.paidStudents || 0)}</td></tr>
                         </table>
                     </div>
                     <div class="col-md-6">
                         <h5>Financial Summary</h5>
                         <table class="table table-sm">
-                            <tr><td>Opening Balance:</td><td>Rs 1,300.00</td></tr>
-                            <tr><td>Total Income:</td><td>Rs 1,200.00</td></tr>
-                            <tr><td>Total Expenses:</td><td>Rs 450.00</td></tr>
-                            <tr><td>Closing Balance:</td><td>Rs 2,050.00</td></tr>
+                            <tr><td>Total Net Balance:</td><td><strong class="${stats.totalBalance >= 0 ? 'text-success' : 'text-danger'}">Rs ${(stats.totalBalance || 0).toFixed(2)}</strong></td></tr>
+                            <tr><td>Monthly Income:</td><td class="text-success">+Rs ${(stats.monthlyIncome || 0).toFixed(2)}</td></tr>
+                            <tr><td>Monthly Expenses:</td><td class="text-danger">-Rs ${(stats.monthlyExpenses || 0).toFixed(2)}</td></tr>
                         </table>
                     </div>
                 </div>
 
                 <div class="mb-4">
                     <h5>Income Details</h5>
-                    <table class="table table-sm">
+                    <table class="table table-sm table-striped">
                         <thead>
                             <tr>
                                 <th>Date</th>
@@ -276,14 +314,14 @@ class ReportsManager {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td>2024-01-15</td><td>Monthly fund collection</td><td>Rs 1,200.00</td></tr>
+                            ${incomeRows}
                         </tbody>
                     </table>
                 </div>
 
                 <div class="mb-4">
                     <h5>Expense Details</h5>
-                    <table class="table table-sm">
+                    <table class="table table-sm table-striped">
                         <thead>
                             <tr>
                                 <th>Date</th>
@@ -292,27 +330,7 @@ class ReportsManager {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td>2024-01-14</td><td>Class outing expenses</td><td>Rs 150.00</td></tr>
-                            <tr><td>2024-01-10</td><td>Stationery purchase</td><td>Rs 300.00</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="mb-4">
-                    <h5>Student Payment Status</h5>
-                    <table class="table table-sm">
-                        <thead>
-                            <tr>
-                                <th>Student Name</th>
-                                <th>Reg No</th>
-                                <th>Status</th>
-                                <th>Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>Ahmad bin Abdullah</td><td>CS001</td><td>Paid</td><td>Rs 50.00</td></tr>
-                            <tr><td>Siti Nurhaliza</td><td>CS002</td><td>Unpaid</td><td>Rs 0.00</td></tr>
-                            <!-- More rows would be here -->
+                            ${expenseRows}
                         </tbody>
                     </table>
                 </div>

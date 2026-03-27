@@ -53,9 +53,11 @@ function getStudents() {
       mobile: row[2] || '',
       email: row[3] || '',
       address: row[4] || '',
-      guardian: row[5] || '',
-      birthday: (row[6] instanceof Date) ? row[6].toISOString().split('T')[0] : '',
-      notes: row[7] || '',
+      guardianName: row[5] || '',
+      guardianMobile: row[6] || '',
+      birthday: (row[7] instanceof Date) ? row[7].toISOString().split('T')[0] : '',
+      race: row[8] || '',
+      notes: row[9] || '',
       paymentStatus: 'unpaid' // This would be calculated based on transactions
     }));
 
@@ -76,14 +78,16 @@ function addStudent(student) {
     // Find next empty row
     const lastRow = sheet.getLastRow() + 1;
 
-    sheet.getRange(lastRow, 1, 1, 8).setValues([[
+    sheet.getRange(lastRow, 1, 1, 10).setValues([[
       student.regNo,
       student.name,
       student.mobile,
       student.email,
       student.address,
-      student.guardian,
+      student.guardianName,
+      student.guardianMobile,
       student.birthday ? new Date(student.birthday) : '',
+      student.race,
       student.notes
     ]]);
 
@@ -108,14 +112,16 @@ function updateStudent(student) {
       throw new Error('Student not found');
     }
 
-    sheet.getRange(rowIndex + 1, 1, 1, 8).setValues([[
+    sheet.getRange(rowIndex + 1, 1, 1, 10).setValues([[
       student.regNo,
       student.name,
       student.mobile,
       student.email,
       student.address,
-      student.guardian,
+      student.guardianName,
+      student.guardianMobile,
       student.birthday ? new Date(student.birthday) : '',
+      student.race,
       student.notes
     ]]);
 

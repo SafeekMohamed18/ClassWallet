@@ -1,5 +1,5 @@
 // ClassWallet Students Management Module
-const API_URL = 'https://script.google.com/macros/s/AKfycbyXHY2enlHchXs9NyWZDEQRfqGo7pHAvrZ2P39t8spnPSn6EuXI3NGaiJCJOIrYw4KX/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbxBaxAjIgJ-eR4AIvl62IygkwYCWn7381ls241bv08B_PWpvvwX3UpG26A0c47yJ9Wh/exec';
 
 class StudentsManager {
     constructor() {
@@ -137,8 +137,10 @@ Reg No: ${student.regNo}
 Mobile: ${student.mobile || 'N/A'}
 Email: ${student.email || 'N/A'}
 Address: ${student.address || 'N/A'}
-Guardian: ${student.guardian || 'N/A'}
+Guardian Name: ${student.guardianName || 'N/A'}
+Guardian Mobile: ${student.guardianMobile || 'N/A'}
 Birthday: ${student.birthday || 'N/A'}
+Race: ${student.race || 'N/A'}
 Notes: ${student.notes || 'N/A'}
 Payment Status: ${student.paymentStatus}`);
     }
@@ -154,8 +156,10 @@ Payment Status: ${student.paymentStatus}`);
         document.getElementById('edit-mobile').value = student.mobile || '';
         document.getElementById('edit-email').value = student.email || '';
         document.getElementById('edit-address').value = student.address || '';
-        document.getElementById('edit-guardian').value = student.guardian || '';
+        document.getElementById('edit-guardian-name').value = student.guardianName || '';
+        document.getElementById('edit-guardian-mobile').value = student.guardianMobile || '';
         document.getElementById('edit-birthday').value = student.birthday || '';
+        document.getElementById('edit-race').value = student.race || '';
         document.getElementById('edit-notes').value = student.notes || '';
 
         // Show edit modal
@@ -176,8 +180,10 @@ Payment Status: ${student.paymentStatus}`);
             mobile: document.getElementById('mobile').value,
             email: document.getElementById('email').value,
             address: document.getElementById('address').value,
-            guardian: document.getElementById('guardian').value,
+            guardianName: document.getElementById('guardian-name').value,
+            guardianMobile: document.getElementById('guardian-mobile').value,
             birthday: document.getElementById('birthday').value,
+            race: document.getElementById('race').value,
             notes: document.getElementById('notes').value,
             paymentStatus: 'unpaid' // New students start as unpaid
         };
@@ -214,8 +220,10 @@ Payment Status: ${student.paymentStatus}`);
             mobile: document.getElementById('edit-mobile').value,
             email: document.getElementById('edit-email').value,
             address: document.getElementById('edit-address').value,
-            guardian: document.getElementById('edit-guardian').value,
+            guardianName: document.getElementById('edit-guardian-name').value,
+            guardianMobile: document.getElementById('edit-guardian-mobile').value,
             birthday: document.getElementById('edit-birthday').value,
+            race: document.getElementById('edit-race').value,
             notes: document.getElementById('edit-notes').value
         };
 
