@@ -157,13 +157,13 @@ class FundsManager {
         const studentId = document.getElementById('income-student').value;
         const date = document.getElementById('income-date').value;
 
-        const studentName = studentId ? this.students.find(s => s.id == studentId)?.name : null;
+        const studentRegNo = studentId ? this.students.find(s => s.id == studentId)?.regNo : null;
 
         const transactionData = {
             type: 'Income',
             amount: amount,
             description: description,
-            student: studentName,
+            student: studentRegNo,
             date: new Date(date).toISOString(),
             addedBy: window.authManager.getCurrentUser().email
         };

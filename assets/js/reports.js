@@ -266,9 +266,24 @@ class ReportsManager {
             return d.getFullYear() === parseInt(year) && (d.getMonth() + 1) === parseInt(monthNum);
         });
         
+        // Calculate paid students for this specific month
+        const paidStudentsSet = new Set();
+        monthTx.forEach(t => {
+            const desc = (t.description || '').toLowerCase();
+            if (t.type === 'Income' && (desc.includes('monthly') || desc.includes('special'))) {
+                if (t.student) paidStudentsSet.add(t.student.toString().trim());
+            }
+        });
+        const monthPaidCount = paidStudentsSet.size;
+
         const incomeTx = monthTx.filter(t => t.type === 'Income');
         const expenseTx = monthTx.filter(t => t.type !== 'Income');
         
+        // Use either the real balance from stats (if current month) or calculate roughly
+        const isCurrentMonth = (new Date().getFullYear() === parseInt(year) && (new Date().getMonth() + 1) === parseInt(monthNum));
+        const displayIncome = isCurrentMonth ? (stats.monthlyIncome || 0) : incomeTx.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+        const displayExpenses = isCurrentMonth ? (stats.monthlyExpenses || 0) : expenseTx.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+
         let incomeRows = incomeTx.map(t => `<tr><td>${t.date.split('T')[0]}</td><td>${t.description}</td><td class="text-success">+Rs ${Math.abs(t.amount).toFixed(2)}</td></tr>`).join('');
         if (!incomeRows) incomeRows = '<tr><td colspan="3" class="text-center text-muted">No income recorded</td></tr>';
         
@@ -289,16 +304,16 @@ class ReportsManager {
                         <h5>Summary</h5>
                         <table class="table table-sm">
                             <tr><td>Total Students:</td><td>${stats.totalStudents || 0}</td></tr>
-                            <tr><td>Paid Students:</td><td>${stats.paidStudents || 0}</td></tr>
-                            <tr><td>Unpaid Students:</td><td>${(stats.totalStudents || 0) - (stats.paidStudents || 0)}</td></tr>
+                            <tr><td>Paid Students:</td><td>${monthPaidCount}</td></tr>
+                            <tr><td>Unpaid Students:</td><td>${(stats.totalStudents || 0) - monthPaidCount}</td></tr>
                         </table>
                     </div>
                     <div class="col-md-6">
                         <h5>Financial Summary</h5>
                         <table class="table table-sm">
                             <tr><td>Total Net Balance:</td><td><strong class="${stats.totalBalance >= 0 ? 'text-success' : 'text-danger'}">Rs ${(stats.totalBalance || 0).toFixed(2)}</strong></td></tr>
-                            <tr><td>Monthly Income:</td><td class="text-success">+Rs ${(stats.monthlyIncome || 0).toFixed(2)}</td></tr>
-                            <tr><td>Monthly Expenses:</td><td class="text-danger">-Rs ${(stats.monthlyExpenses || 0).toFixed(2)}</td></tr>
+                            <tr><td>Monthly Income:</td><td class="text-success">+Rs ${displayIncome.toFixed(2)}</td></tr>
+                            <tr><td>Monthly Expenses:</td><td class="text-danger">-Rs ${displayExpenses.toFixed(2)}</td></tr>
                         </table>
                     </div>
                 </div>
@@ -341,43 +356,155 @@ class ReportsManager {
     async createPDF(type, month) {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
+        const [year, monthNum] = month.split('-');
+        const monthName = new Date(year, monthNum - 1).toLocaleString('default', { month: 'long' });
 
         try {
-            // Add Logo to PDF header
-            doc.addImage('assets/images/Logo.png', 'PNG', 15, 10, 22, 22);
+            // Show loading state on button
+            const downloadBtn = document.getElementById('download-pdf-btn');
+            const originalText = downloadBtn.innerHTML;
+            downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Preparing PDF...';
+            downloadBtn.disabled = true;
+
+            // Fetch real data
+            const [txRes, statRes] = await Promise.all([
+                fetch(`${API_URL}?action=getTransactions`),
+                fetch(`${API_URL}?action=getDashboardData`)
+            ]);
             
-            doc.setFontSize(20);
-            doc.setTextColor(40, 40, 40);
+            const txResult = await txRes.json();
+            const statResult = await statRes.json();
+            
+            const transactions = txResult.success ? txResult.data : [];
+            const stats = statResult.success ? statResult.data : { totalStudents: 0, paidStudents: 0, totalBalance: 0, monthlyIncome: 0, monthlyExpenses: 0 };
+
+            // Filter transactions for the selected month
+            const monthTx = transactions.filter(t => {
+                const d = new Date(t.date);
+                return d.getFullYear() === parseInt(year) && (d.getMonth() + 1) === parseInt(monthNum);
+            });
+            
+            // Calculate paid students for this specific month
+            const paidStudentsSet = new Set();
+            monthTx.forEach(t => {
+                const desc = (t.description || '').toLowerCase();
+                if (t.type === 'Income' && (desc.includes('monthly') || desc.includes('special'))) {
+                    if (t.student) paidStudentsSet.add(t.student.toString().trim());
+                }
+            });
+            const monthPaidCount = paidStudentsSet.size;
+
+            const incomeTx = monthTx.filter(t => t.type === 'Income');
+            const expenseTx = monthTx.filter(t => t.type !== 'Income');
+            
+            const isCurrentMonth = (new Date().getFullYear() === parseInt(year) && (new Date().getMonth() + 1) === parseInt(monthNum));
+            const displayIncome = isCurrentMonth ? (stats.monthlyIncome || 0) : incomeTx.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+            const displayExpenses = isCurrentMonth ? (stats.monthlyExpenses || 0) : expenseTx.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+
+            // --- PDF Content ---
+            // 1. Header
+            try {
+                doc.addImage('assets/images/Logo.png', 'PNG', 15, 10, 22, 22);
+            } catch (e) { console.warn('Logo not available'); }
+            
+            doc.setFontSize(22);
+            doc.setTextColor(33, 37, 41);
             doc.text('ClassWallet Financial Report', 42, 20);
             
-            doc.setFontSize(12);
-            doc.text(`Report Type: ${this.getReportTypeName(type)}`, 42, 28);
-            doc.text(`Period: ${month}`, 42, 35);
+            doc.setFontSize(14);
+            doc.text(`${monthName} ${year}`, 42, 28);
+            
+            doc.setFontSize(10);
+            doc.setTextColor(100, 100, 100);
+            doc.text(`Generated on ${new Date().toLocaleDateString()}`, 42, 34);
 
-            doc.setLineWidth(0.5);
+            doc.setDrawColor(200, 200, 200);
             doc.line(15, 40, 195, 40);
 
-            doc.text('Summary of financial activities and student payment statuses.', 20, 50);
-        } catch (e) {
-            console.warn('Logo could not be loaded into PDF:', e);
-            doc.text('ClassWallet Financial Report', 20, 20);
+            // 2. Summary
+            doc.setFontSize(14);
+            doc.setTextColor(33, 37, 41);
+            doc.text('Summary', 20, 52);
+            
+            doc.setFontSize(11);
+            doc.text([
+                `Total Students: ${stats.totalStudents || 0}`,
+                `Paid Students: ${monthPaidCount}`,
+                `Unpaid Students: ${(stats.totalStudents || 0) - monthPaidCount}`
+            ], 20, 60);
+
+            doc.text([
+                `Monthly Income: Rs ${displayIncome.toFixed(2)}`,
+                `Monthly Expenses: Rs ${displayExpenses.toFixed(2)}`,
+                `Closing Balance: Rs ${(stats.totalBalance || 0).toFixed(2)}`
+            ], 110, 60);
+
+            // 3. Income Table
+            doc.setFontSize(14);
+            doc.text('Income Details', 20, 85);
+            
+            const incomeData = incomeTx.map(t => [
+                t.date.split('T')[0], 
+                t.description, 
+                `Rs ${Math.abs(t.amount).toFixed(2)}`
+            ]);
+
+            doc.autoTable({
+                startY: 90,
+                head: [['Date', 'Description', 'Amount']],
+                body: incomeData.length > 0 ? incomeData : [['-', 'No income recorded', '-']],
+                headStyles: { fillColor: [45, 190, 96] }, // Success green
+                theme: 'striped'
+            });
+
+            // 4. Expense Table
+            const lastY = doc.lastAutoTable.finalY + 15;
+            doc.setFontSize(14);
+            doc.text('Expense Details', 20, lastY);
+            
+            const expenseData = expenseTx.map(t => [
+                t.date.split('T')[0], 
+                t.description, 
+                `Rs ${Math.abs(t.amount).toFixed(2)}`
+            ]);
+
+            doc.autoTable({
+                startY: lastY + 5,
+                head: [['Date', 'Description', 'Amount']],
+                body: expenseData.length > 0 ? expenseData : [['-', 'No expenses recorded', '-']],
+                headStyles: { fillColor: [220, 53, 69] }, // Danger red
+                theme: 'striped'
+            });
+
+            // Save PDF
+            const fileName = `ClassWallet_Report_${month}.pdf`;
+            doc.save(fileName);
+
+            // Add to history
+            const newReport = {
+                id: Date.now(),
+                name: `${this.getReportTypeName(type)} - ${month}`,
+                type: this.getReportTypeName(type),
+                period: month,
+                generated: new Date().toISOString().split('T')[0],
+                fileUrl: fileName
+            };
+            this.reports.unshift(newReport);
+            this.renderRecentReports();
+
+            // Reset button
+            downloadBtn.innerHTML = originalText;
+            downloadBtn.disabled = false;
+
+        } catch (error) {
+            console.error('Error creating PDF:', error);
+            this.showError('Failed to generate PDF');
+            const downloadBtn = document.getElementById('download-pdf-btn');
+            if (downloadBtn) {
+                downloadBtn.innerHTML = '<i class="fas fa-download me-1"></i>Download PDF';
+                downloadBtn.disabled = false;
+            }
         }
-
-        // Save the PDF
-        const fileName = `ClassWallet_Report_${month}.pdf`;
-        doc.save(fileName);
-
-        // Add to recent reports
-        const newReport = {
-            id: Date.now(),
-            name: `${type} - ${month}`,
-            type: this.getReportTypeName(type),
-            period: month,
-            generated: new Date().toISOString().split('T')[0],
-            fileUrl: fileName
-        };
-        this.reports.unshift(newReport);
-        this.renderRecentReports();
     }
 
     getReportTypeName(type) {

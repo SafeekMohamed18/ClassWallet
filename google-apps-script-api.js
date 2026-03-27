@@ -57,8 +57,7 @@ function getStudents() {
       guardianMobile: row[6] || '',
       birthday: (row[7] instanceof Date) ? row[7].toISOString().split('T')[0] : '',
       race: row[8] || '',
-      notes: row[9] || '',
-      paymentStatus: 'unpaid' // This would be calculated based on transactions
+      notes: row[9] || ''
     }));
 
     return ContentService
@@ -237,6 +236,18 @@ function getDashboardData() {
     const currentMonth = new Date().getMonth();
     const currentYear = new Date().getFullYear();
 
+    // Helper to check if a transaction is a monthly payment for the current month
+    const isMonthlyPayment = (row) => {
+      const type = row[1];
+      const desc = (row[3] || '').toString().toLowerCase();
+      const date = new Date(row[6]);
+      const isCurrentMonth = date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+      return type === 'Income' && isCurrentMonth && (desc.includes('monthly') || desc.includes('special'));
+    };
+
+    // Use a Set to store unique registration numbers of students who paid this month
+    const paidStudentRegNos = new Set();
+    
     transactions.forEach(row => {
       const amount = parseFloat(row[2]) || 0;
       const date = new Date(row[6]);
@@ -250,6 +261,14 @@ function getDashboardData() {
         } else {
           monthlyExpenses += Math.abs(amount);
         }
+        
+        // Track paid students
+        if (isMonthlyPayment(row)) {
+          const regNo = row[4]; // Registration Number is stored in Column E
+          if (regNo) {
+            paidStudentRegNos.add(regNo.toString().trim());
+          }
+        }
       }
     });
 
@@ -258,7 +277,7 @@ function getDashboardData() {
       monthlyIncome: monthlyIncome,
       monthlyExpenses: monthlyExpenses,
       totalStudents: students.length,
-      paidStudents: 0 // This would need more complex logic based on payment tracking
+      paidStudents: paidStudentRegNos.size
     };
 
     return ContentService

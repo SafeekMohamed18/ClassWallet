@@ -75,12 +75,7 @@ class StudentsManager {
                                 student.regNo.toLowerCase().includes(searchTerm) ||
                                 student.email.toLowerCase().includes(searchTerm);
 
-            let matchesFilter = true;
-            if (filterValue === 'paid') {
-                matchesFilter = student.paymentStatus === 'paid';
-            } else if (filterValue === 'unpaid') {
-                matchesFilter = student.paymentStatus === 'unpaid';
-            }
+            const matchesFilter = true; // status filter removed
 
             return matchesSearch && matchesFilter;
         });
@@ -105,18 +100,13 @@ class StudentsManager {
                 <td>${student.mobile || '-'}</td>
                 <td>${student.email || '-'}</td>
                 <td>
-                    <span class="badge ${student.paymentStatus === 'paid' ? 'bg-success' : 'bg-warning'}">
-                        ${student.paymentStatus === 'paid' ? 'Paid' : 'Unpaid'}
-                    </span>
-                </td>
-                <td>
-                    <button class="btn btn-sm btn-outline-primary me-1" onclick="studentsManager.viewStudent(${student.id})">
+                    <button class="btn btn-sm btn-outline-info me-1" onclick="studentsManager.viewStudent(${student.id})" title="View Details">
                         <i class="fas fa-eye"></i>
                     </button>
-                    <button class="btn btn-sm btn-outline-secondary me-1" onclick="studentsManager.editStudent(${student.id})">
+                    <button class="btn btn-sm btn-outline-primary me-1" onclick="studentsManager.editStudent(${student.id})" title="Edit">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="studentsManager.deleteStudent(${student.id})">
+                    <button class="btn btn-sm btn-outline-danger" onclick="studentsManager.deleteStudent(${student.id})" title="Delete">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
@@ -141,8 +131,7 @@ Guardian Name: ${student.guardianName || 'N/A'}
 Guardian Mobile: ${student.guardianMobile || 'N/A'}
 Birthday: ${student.birthday || 'N/A'}
 Race: ${student.race || 'N/A'}
-Notes: ${student.notes || 'N/A'}
-Payment Status: ${student.paymentStatus}`);
+Notes: ${student.notes || 'N/A'}`);
     }
 
     editStudent(id) {
