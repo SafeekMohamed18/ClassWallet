@@ -1,5 +1,5 @@
 // ClassWallet Dashboard Module
-const API_URL = 'https://script.google.com/macros/s/AKfycbxojIElp5StBRvezU8uZ8RSvmnxKIkYHR6jLI9Urr2nC0u84ZhCi-z7vrS_LrX2TxE1/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbzHbdwhN1bwCsGDn5gFjne1vN99ZJjUO-9r1MW1LPlFpHv7uJNmYCPc_PNFe0JuAQPj/exec';
 
 class DashboardManager {
     constructor() {
@@ -23,40 +23,26 @@ class DashboardManager {
 
     async loadDashboardData() {
         try {
-            // Load summary data
-            const summary = await this.fetchSummaryData();
-            this.updateSummaryCards(summary);
+            // Fetch all dashboard data in one call
+            const response = await fetch(`${API_URL}?action=getDashboardData`);
+            const result = await response.json();
+            if (!result.success) throw new Error(result.error);
+            const data = result.data;
 
-            // Load chart data
-            const chartData = await this.fetchChartData();
-            this.updateChart(chartData);
+            // Update all dashboard components
+            this.updateSummaryCards(data);
+            this.updateChart(data.chartData || { labels: [], income: [], expenses: [] });
+            this.updateMonthlyOverview(data);
 
-            // Load recent transactions
+            // Fetch and update recent transactions (separate endpoint)
             const transactions = await this.fetchRecentTransactions();
             this.updateRecentTransactions(transactions);
-
-            // Load monthly overview
-            this.loadMonthlyOverview();
         } catch (error) {
             console.error('Error loading dashboard data:', error);
             this.showError('Failed to load dashboard data');
         }
     }
 
-    async fetchSummaryData() {
-        const response = await fetch(`${API_URL}?action=getDashboardData`);
-        const result = await response.json();
-        if (!result.success) throw new Error(result.error);
-        return result.data;
-    }
-
-    async fetchChartData() {
-        // Fetching chart data from the dashboard endpoint
-        const response = await fetch(`${API_URL}?action=getDashboardData`);
-        const result = await response.json();
-        if (!result.success) throw new Error(result.error);
-        return result.data.chartData || { labels: [], income: [], expenses: [] };
-    }
 
     async fetchRecentTransactions() {
         const response = await fetch(`${API_URL}?action=getTransactions`);
@@ -168,23 +154,24 @@ class DashboardManager {
     updateMonthlyOverview(data) {
         const overviewDiv = document.getElementById('monthly-overview');
         
-        // Map the API response variables correctly, with fallbacks to avoid crashes
-        const income = data.totalIncome !== undefined ? data.totalIncome : (data.monthlyIncome || 0);
-        const expenses = data.totalExpenses !== undefined ? data.totalExpenses : (data.monthlyExpenses || 0);
-        const pending = data.pendingPayments !== undefined ? data.pendingPayments : (data.totalStudents - data.paidStudents || 0);
+        const income = data.monthlyIncome || 0;
+        const expenses = data.monthlyExpenses || 0;
+        const totalStudents = data.totalStudents || 0;
+        const paidStudents = data.paidStudents || 0;
+        const pending = totalStudents - paidStudents;
 
         overviewDiv.innerHTML = `
             <div class="row">
                 <div class="col-md-6">
-                    <h6>Payment Status</h6>
-                    <p class="mb-1">Paid: <strong>${data.paidStudents || 0}/${data.totalStudents || 0}</strong></p>
-                    <p class="mb-1">Pending: <strong>${pending}</strong></p>
+                    <h6 class="text-muted mb-2">Payment Status</h6>
+                    <p class="mb-1">Paid: <span class="badge bg-success">${paidStudents} / ${totalStudents}</span></p>
+                    <p class="mb-1">Pending: <span class="badge bg-warning text-dark">${pending}</span></p>
                 </div>
                 <div class="col-md-6">
-                    <h6>Financial Summary</h6>
+                    <h6 class="text-muted mb-2">Financial Summary</h6>
                     <p class="mb-1 text-success">Income: <strong>Rs ${income.toFixed(2)}</strong></p>
                     <p class="mb-1 text-danger">Expenses: <strong>Rs ${expenses.toFixed(2)}</strong></p>
-                    <p class="mb-0">Net: <strong class="${income - expenses >= 0 ? 'text-success' : 'text-danger'}">
+                    <p class="mb-0 border-top pt-1 mt-1">Net: <strong class="${income - expenses >= 0 ? 'text-success' : 'text-danger'}">
                         Rs ${(income - expenses).toFixed(2)}
                     </strong></p>
                 </div>

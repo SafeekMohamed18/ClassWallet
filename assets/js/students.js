@@ -1,5 +1,5 @@
 // ClassWallet Students Management Module
-const API_URL = 'https://script.google.com/macros/s/AKfycbxojIElp5StBRvezU8uZ8RSvmnxKIkYHR6jLI9Urr2nC0u84ZhCi-z7vrS_LrX2TxE1/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbzHbdwhN1bwCsGDn5gFjne1vN99ZJjUO-9r1MW1LPlFpHv7uJNmYCPc_PNFe0JuAQPj/exec';
 
 class StudentsManager {
     constructor() {

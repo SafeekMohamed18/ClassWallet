@@ -10,7 +10,7 @@ function doGet(e) {
     case 'getTransactions':
       return getTransactions();
     case 'getDashboardData':
-      return getDashboardData();
+      return getDashboardData(e.parameter);
     default:
       return ContentService
         .createTextOutput(JSON.stringify({error: 'Invalid action'}))
@@ -221,7 +221,7 @@ function deleteTransaction(transactionId) {
   }
 }
 
-function getDashboardData() {
+function getDashboardData(params) {
   try {
     const transactionSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Transactions');
     const studentSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Students');
@@ -229,42 +229,52 @@ function getDashboardData() {
     const transactions = transactionSheet.getDataRange().getValues().slice(1);
     const students = studentSheet.getDataRange().getValues().slice(1);
 
-    // Calculate dashboard metrics
+    const now = new Date();
+    let targetMonth = now.getMonth();
+    let targetYear = now.getFullYear();
+
+    // Handle month parameter
+    if (params && params.month === 'previous') {
+      targetMonth--;
+      if (targetMonth < 0) {
+        targetMonth = 11;
+        targetYear--;
+      }
+    }
+
+    // Calculate dashboard metrics for the target month
     let totalBalance = 0;
     let monthlyIncome = 0;
     let monthlyExpenses = 0;
-    const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
+    const paidStudentRegNos = new Set();
 
-    // Helper to check if a transaction is a monthly payment for the current month
+    // Helper to check if a transaction belongs to a specific month/year
+    const isTargetMonth = (date, m, y) => date.getMonth() === m && date.getFullYear() === y;
+
+    // Helper to check if a transaction is a monthly payment
     const isMonthlyPayment = (row) => {
       const type = row[1];
       const desc = (row[3] || '').toString().toLowerCase();
-      const date = new Date(row[6]);
-      const isCurrentMonth = date.getMonth() === currentMonth && date.getFullYear() === currentYear;
-      return type === 'Income' && isCurrentMonth && (desc.includes('monthly') || desc.includes('special'));
+      return type === 'Income' && (desc.includes('monthly') || desc.includes('special'));
     };
 
-    // Use a Set to store unique registration numbers of students who paid this month
-    const paidStudentRegNos = new Set();
-    
     transactions.forEach(row => {
       const amount = parseFloat(row[2]) || 0;
       const date = new Date(row[6]);
-      const isCurrentMonth = date.getMonth() === currentMonth && date.getFullYear() === currentYear;
-
+      
+      // Always update total balance
       totalBalance += amount;
 
-      if (isCurrentMonth) {
+      if (isTargetMonth(date, targetMonth, targetYear)) {
         if (amount > 0) {
           monthlyIncome += amount;
         } else {
           monthlyExpenses += Math.abs(amount);
         }
         
-        // Track paid students
+        // Track paid students for target month
         if (isMonthlyPayment(row)) {
-          const regNo = row[4]; // Registration Number is stored in Column E
+          const regNo = row[4]; 
           if (regNo) {
             paidStudentRegNos.add(regNo.toString().trim());
           }
@@ -272,12 +282,49 @@ function getDashboardData() {
       }
     });
 
+    // Generate chart data for the last 6 months
+    const chartLabels = [];
+    const chartIncome = [];
+    const chartExpenses = [];
+
+    for (let i = 5; i >= 0; i--) {
+      let m = now.getMonth() - i;
+      let y = now.getFullYear();
+      if (m < 0) {
+        m += 12;
+        y--;
+      }
+
+      const monthName = new Date(y, m).toLocaleString('default', { month: 'short' });
+      chartLabels.push(monthName);
+
+      let mIncome = 0;
+      let mExpenses = 0;
+
+      transactions.forEach(row => {
+        const amount = parseFloat(row[2]) || 0;
+        const date = new Date(row[6]);
+        if (isTargetMonth(date, m, y)) {
+          if (amount > 0) mIncome += amount;
+          else mExpenses += Math.abs(amount);
+        }
+      });
+
+      chartIncome.push(mIncome);
+      chartExpenses.push(mExpenses);
+    }
+
     const dashboardData = {
       totalBalance: totalBalance,
       monthlyIncome: monthlyIncome,
       monthlyExpenses: monthlyExpenses,
       totalStudents: students.length,
-      paidStudents: paidStudentRegNos.size
+      paidStudents: paidStudentRegNos.size,
+      chartData: {
+        labels: chartLabels,
+        income: chartIncome,
+        expenses: chartExpenses
+      }
     };
 
     return ContentService
