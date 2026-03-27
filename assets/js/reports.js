@@ -1,5 +1,5 @@
 // ClassWallet Reports Module
-const API_URL = 'https://script.google.com/macros/s/AKfycbzIduTUyGh6YyYQyB7sp0P1XepEFrXGaP5D0l2-XCgRKX6Q4k2PVRYpDFSVlRqrc52w/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbyOqPp7p56EW-5wR3rGWPAOrelCJIxVfvrrdENTHL8mFOLzk_KWwGRh_sib0jYPKVw/exec';
 
 class ReportsManager {
     constructor() {
@@ -82,8 +82,8 @@ class ReportsManager {
     updateStats(stats) {
         document.getElementById('total-students').textContent = stats.totalStudents;
         document.getElementById('paid-this-month').textContent = stats.paidThisMonth;
-        document.getElementById('current-balance').textContent = `RM ${stats.currentBalance.toFixed(2)}`;
-        document.getElementById('monthly-income-stat').textContent = `RM ${stats.monthlyIncome.toFixed(2)}`;
+        document.getElementById('current-balance').textContent = `Rs ${stats.currentBalance.toFixed(2)}`;
+        document.getElementById('monthly-income-stat').textContent = `Rs ${stats.monthlyIncome.toFixed(2)}`;
     }
 
     updateCharts(data) {
@@ -257,10 +257,10 @@ class ReportsManager {
                     <div class="col-md-6">
                         <h5>Financial Summary</h5>
                         <table class="table table-sm">
-                            <tr><td>Opening Balance:</td><td>RM 1,300.00</td></tr>
-                            <tr><td>Total Income:</td><td>RM 1,200.00</td></tr>
-                            <tr><td>Total Expenses:</td><td>RM 450.00</td></tr>
-                            <tr><td>Closing Balance:</td><td>RM 2,050.00</td></tr>
+                            <tr><td>Opening Balance:</td><td>Rs 1,300.00</td></tr>
+                            <tr><td>Total Income:</td><td>Rs 1,200.00</td></tr>
+                            <tr><td>Total Expenses:</td><td>Rs 450.00</td></tr>
+                            <tr><td>Closing Balance:</td><td>Rs 2,050.00</td></tr>
                         </table>
                     </div>
                 </div>
@@ -276,7 +276,7 @@ class ReportsManager {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td>2024-01-15</td><td>Monthly fund collection</td><td>RM 1,200.00</td></tr>
+                            <tr><td>2024-01-15</td><td>Monthly fund collection</td><td>Rs 1,200.00</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -292,8 +292,8 @@ class ReportsManager {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td>2024-01-14</td><td>Class outing expenses</td><td>RM 150.00</td></tr>
-                            <tr><td>2024-01-10</td><td>Stationery purchase</td><td>RM 300.00</td></tr>
+                            <tr><td>2024-01-14</td><td>Class outing expenses</td><td>Rs 150.00</td></tr>
+                            <tr><td>2024-01-10</td><td>Stationery purchase</td><td>Rs 300.00</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -310,8 +310,8 @@ class ReportsManager {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td>Ahmad bin Abdullah</td><td>CS001</td><td>Paid</td><td>RM 50.00</td></tr>
-                            <tr><td>Siti Nurhaliza</td><td>CS002</td><td>Unpaid</td><td>RM 0.00</td></tr>
+                            <tr><td>Ahmad bin Abdullah</td><td>CS001</td><td>Paid</td><td>Rs 50.00</td></tr>
+                            <tr><td>Siti Nurhaliza</td><td>CS002</td><td>Unpaid</td><td>Rs 0.00</td></tr>
                             <!-- More rows would be here -->
                         </tbody>
                     </table>

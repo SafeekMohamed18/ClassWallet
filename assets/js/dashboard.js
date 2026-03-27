@@ -1,5 +1,5 @@
 // ClassWallet Dashboard Module
-const API_URL = 'https://script.google.com/macros/s/AKfycbzIduTUyGh6YyYQyB7sp0P1XepEFrXGaP5D0l2-XCgRKX6Q4k2PVRYpDFSVlRqrc52w/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbyOqPp7p56EW-5wR3rGWPAOrelCJIxVfvrrdENTHL8mFOLzk_KWwGRh_sib0jYPKVw/exec';
 
 class DashboardManager {
     constructor() {
@@ -66,9 +66,9 @@ class DashboardManager {
     }
 
     updateSummaryCards(data) {
-        document.getElementById('total-balance').textContent = `RM ${data.totalBalance.toFixed(2)}`;
-        document.getElementById('monthly-income').textContent = `RM ${data.monthlyIncome.toFixed(2)}`;
-        document.getElementById('monthly-expenses').textContent = `RM ${data.monthlyExpenses.toFixed(2)}`;
+        document.getElementById('total-balance').textContent = `Rs ${data.totalBalance.toFixed(2)}`;
+        document.getElementById('monthly-income').textContent = `Rs ${data.monthlyIncome.toFixed(2)}`;
+        document.getElementById('monthly-expenses').textContent = `Rs ${data.monthlyExpenses.toFixed(2)}`;
         document.getElementById('paid-students').textContent = `${data.paidStudents}/${data.totalStudents}`;
     }
 
@@ -113,7 +113,7 @@ class DashboardManager {
                         beginAtZero: true,
                         ticks: {
                             callback: function(value) {
-                                return 'RM ' + value;
+                                return 'Rs ' + value;
                             }
                         }
                     }
@@ -137,7 +137,7 @@ class DashboardManager {
                 </td>
                 <td>${transaction.description}</td>
                 <td class="${transaction.type === 'Income' ? 'text-success' : 'text-danger'}">
-                    ${transaction.type === 'Income' ? '+' : ''}RM ${Math.abs(transaction.amount).toFixed(2)}
+                    ${transaction.type === 'Income' ? '+' : ''}Rs ${Math.abs(transaction.amount).toFixed(2)}
                 </td>
                 <td>${transaction.addedBy}</td>
             `;
@@ -176,10 +176,10 @@ class DashboardManager {
                 </div>
                 <div class="col-md-6">
                     <h6>Financial Summary</h6>
-                    <p class="mb-1 text-success">Income: <strong>RM ${data.totalIncome.toFixed(2)}</strong></p>
-                    <p class="mb-1 text-danger">Expenses: <strong>RM ${data.totalExpenses.toFixed(2)}</strong></p>
+                    <p class="mb-1 text-success">Income: <strong>Rs ${data.totalIncome.toFixed(2)}</strong></p>
+                    <p class="mb-1 text-danger">Expenses: <strong>Rs ${data.totalExpenses.toFixed(2)}</strong></p>
                     <p class="mb-0">Net: <strong class="${data.totalIncome - data.totalExpenses >= 0 ? 'text-success' : 'text-danger'}">
-                        RM ${(data.totalIncome - data.totalExpenses).toFixed(2)}
+                        Rs ${(data.totalIncome - data.totalExpenses).toFixed(2)}
                     </strong></p>
                 </div>
             </div>

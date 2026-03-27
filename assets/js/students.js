@@ -1,5 +1,5 @@
 // ClassWallet Students Management Module
-const API_URL = 'https://script.google.com/macros/s/AKfycbzIduTUyGh6YyYQyB7sp0P1XepEFrXGaP5D0l2-XCgRKX6Q4k2PVRYpDFSVlRqrc52w/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbyOqPp7p56EW-5wR3rGWPAOrelCJIxVfvrrdENTHL8mFOLzk_KWwGRh_sib0jYPKVw/exec';
 
 class StudentsManager {
     constructor() {
@@ -267,7 +267,7 @@ Payment Status: ${student.paymentStatus}`);
         const response = await fetch(API_URL, {
             method: 'POST',
             mode: 'no-cors', // Use no-cors if experiencing redirect issues with GAS
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({ action: 'addStudent', student: data })
         });
         // Note: With no-cors, you won't be able to read the response body. 
@@ -278,7 +278,7 @@ Payment Status: ${student.paymentStatus}`);
     async updateStudentInAPI(id, data) {
         await fetch(API_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({ 
                 action: 'updateStudent', 
                 student: { ...data, id: id } 
@@ -289,7 +289,7 @@ Payment Status: ${student.paymentStatus}`);
     async deleteStudentFromAPI(id) {
         await fetch(API_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({ 
                 action: 'deleteStudent', 
                 studentId: id 

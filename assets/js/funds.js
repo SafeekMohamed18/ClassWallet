@@ -1,5 +1,5 @@
 // ClassWallet Funds Management Module
-const API_URL = 'https://script.google.com/macros/s/AKfycbzIduTUyGh6YyYQyB7sp0P1XepEFrXGaP5D0l2-XCgRKX6Q4k2PVRYpDFSVlRqrc52w/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbyOqPp7p56EW-5wR3rGWPAOrelCJIxVfvrrdENTHL8mFOLzk_KWwGRh_sib0jYPKVw/exec';
 
 class FundsManager {
     constructor() {
@@ -132,7 +132,7 @@ class FundsManager {
                 <td>${transaction.description}</td>
                 <td>${transaction.student || '-'}</td>
                 <td class="${transaction.type === 'Income' ? 'text-success' : 'text-danger'}">
-                    ${transaction.type === 'Income' ? '+' : ''}RM ${Math.abs(transaction.amount).toFixed(2)}
+                    ${transaction.type === 'Income' ? '+' : ''}Rs ${Math.abs(transaction.amount).toFixed(2)}
                 </td>
                 <td>${transaction.addedBy}</td>
                 <td>
@@ -249,7 +249,7 @@ class FundsManager {
     async saveTransactionToAPI(data) {
         const response = await fetch(API_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({ action: 'addTransaction', transaction: data })
         });
         const result = await response.json();
@@ -260,7 +260,7 @@ class FundsManager {
     async deleteTransactionFromAPI(id) {
         const response = await fetch(API_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({ action: 'deleteTransaction', transactionId: id })
         });
         const result = await response.json();
