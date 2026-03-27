@@ -305,7 +305,7 @@ class ReportsManager {
             <div class="report-preview">
                 <div class="text-center mb-4">
                     <img src="assets/images/Logo.png" alt="ClassWallet Logo" width="80" class="logo-radius mb-3">
-                    <h2>ClassWallet Financial Report</h2>
+                    <h2><span class="brand-class">Class</span><span class="brand-wallet">Wallet</span> Financial Report</h2>
                     <h4>${monthName} ${year}</h4>
                     <p class="text-muted">Generated on ${new Date().toLocaleDateString()}</p>
                 </div>
@@ -419,8 +419,16 @@ class ReportsManager {
             } catch (e) { console.warn('Logo not available'); }
             
             doc.setFontSize(22);
+            doc.setTextColor(4, 63, 113); // #043F71
+            doc.text('Class', 42, 20);
+            const classWidth = doc.getTextWidth('Class');
+            
+            doc.setTextColor(93, 157, 22); // #5D9D16
+            doc.text('Wallet', 42 + classWidth, 20);
+            const walletWidth = doc.getTextWidth('Wallet');
+            
             doc.setTextColor(33, 37, 41);
-            doc.text('ClassWallet Financial Report', 42, 20);
+            doc.text(' Financial Report', 42 + classWidth + walletWidth, 20);
             
             doc.setFontSize(14);
             doc.text(`${monthName} ${year}`, 42, 28);

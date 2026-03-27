@@ -10,11 +10,11 @@
     <link href="assets/css/style.css" rel="stylesheet">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm sticky-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="index.html">
                 <img src="assets/images/Logo.png" alt="ClassWallet Logo" width="30" height="30" class="logo-radius d-inline-block align-top me-2">
-                ClassWallet
+                <span class="brand-class">Class</span><span class="brand-wallet">Wallet</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -42,10 +42,10 @@
                         </a>
                     </li>
                 </ul>
-                <div class="d-flex">
+                <div class="d-flex align-items-center">
                     <div id="user-info" class="d-none">
-                        <span id="user-email" class="text-white me-2"></span>
-                        <button id="signout-btn" class="btn btn-outline-light btn-sm">Sign Out</button>
+                        <span id="user-email" class="text-muted me-3 small"></span>
+                        <button id="signout-btn" class="btn btn-outline-danger btn-sm">Sign Out</button>
                     </div>
                     <div id="signin-btn"></div>
                 </div>
@@ -56,7 +56,7 @@
     <div class="container mt-4">
         <div id="auth-required" class="alert alert-warning d-none">
             <i class="fas fa-exclamation-triangle me-2"></i>
-            Please sign in with your Google account to access ClassWallet.
+            Please sign in with your Google account to access <span class="brand-class">Class</span><span class="brand-wallet">Wallet</span>.
         </div>
 
         <div id="main-content" class="d-none">

@@ -16,7 +16,16 @@ body {
 }
 
 .navbar-brand {
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 1.4rem;
+}
+
+.brand-class {
+    color: #043F71;
+}
+
+.brand-wallet {
+    color: #5D9D16;
 }
 
 .logo-radius {

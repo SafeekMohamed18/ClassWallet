@@ -10,7 +10,9 @@ class AuthManager {
             'Oshani2003u@gmail.com',
             'skkuruwita@gmail.com',
             'samarasinghebhagya123@gmail.com',
-            'Suranthadarshana6@gmail.com' // <-- ADD NEW MEMBER EMAILS HERE
+            'Suranthadarshana6@gmail.com',
+            'sampathweragoda17@gmail.com'
+             // <-- ADD NEW MEMBER EMAILS HERE
         ];
         this.init();
     }
