@@ -4,7 +4,6 @@ class AuthManager {
         this.currentUser = null;
         this.allowedEmails = [
             'ut03211tic@gmail.com',
-            'mohamedsafeek0618@gmail.com',
             'bweerasinghe2004@gmail.com',
             'hapugodasanjana@gmail.com',
             'oshani2003u@gmail.com',
