@@ -1,5 +1,5 @@
 // ClassWallet Funds Management Module
-const API_URL = 'https://script.google.com/macros/s/AKfycbxBaxAjIgJ-eR4AIvl62IygkwYCWn7381ls241bv08B_PWpvvwX3UpG26A0c47yJ9Wh/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbxojIElp5StBRvezU8uZ8RSvmnxKIkYHR6jLI9Urr2nC0u84ZhCi-z7vrS_LrX2TxE1/exec';
 
 class FundsManager {
     constructor() {
