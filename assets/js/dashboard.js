@@ -167,19 +167,25 @@ class DashboardManager {
 
     updateMonthlyOverview(data) {
         const overviewDiv = document.getElementById('monthly-overview');
+        
+        // Map the API response variables correctly, with fallbacks to avoid crashes
+        const income = data.totalIncome !== undefined ? data.totalIncome : (data.monthlyIncome || 0);
+        const expenses = data.totalExpenses !== undefined ? data.totalExpenses : (data.monthlyExpenses || 0);
+        const pending = data.pendingPayments !== undefined ? data.pendingPayments : (data.totalStudents - data.paidStudents || 0);
+
         overviewDiv.innerHTML = `
             <div class="row">
                 <div class="col-md-6">
                     <h6>Payment Status</h6>
-                    <p class="mb-1">Paid: <strong>${data.paidStudents}/${data.totalStudents}</strong></p>
-                    <p class="mb-1">Pending: <strong>${data.pendingPayments}</strong></p>
+                    <p class="mb-1">Paid: <strong>${data.paidStudents || 0}/${data.totalStudents || 0}</strong></p>
+                    <p class="mb-1">Pending: <strong>${pending}</strong></p>
                 </div>
                 <div class="col-md-6">
                     <h6>Financial Summary</h6>
-                    <p class="mb-1 text-success">Income: <strong>Rs ${data.totalIncome.toFixed(2)}</strong></p>
-                    <p class="mb-1 text-danger">Expenses: <strong>Rs ${data.totalExpenses.toFixed(2)}</strong></p>
-                    <p class="mb-0">Net: <strong class="${data.totalIncome - data.totalExpenses >= 0 ? 'text-success' : 'text-danger'}">
-                        Rs ${(data.totalIncome - data.totalExpenses).toFixed(2)}
+                    <p class="mb-1 text-success">Income: <strong>Rs ${income.toFixed(2)}</strong></p>
+                    <p class="mb-1 text-danger">Expenses: <strong>Rs ${expenses.toFixed(2)}</strong></p>
+                    <p class="mb-0">Net: <strong class="${income - expenses >= 0 ? 'text-success' : 'text-danger'}">
+                        Rs ${(income - expenses).toFixed(2)}
                     </strong></p>
                 </div>
             </div>
