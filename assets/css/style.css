@@ -1,8 +1,8 @@
 /* ClassWallet Custom Styles */
 
 :root {
-    --primary-color: #1E6F9F;
-    --secondary-color: #2DBE60;
+    --primary-color: #043F71;
+    --secondary-color: #5D9D16;
     --accent-color: #F4C542;
     --background-color: #F8FAFC;
     --text-color: #333333;
@@ -20,6 +20,16 @@ body {
     font-size: 1.4rem;
 }
 
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: var(--secondary-color);
+}
+
 .brand-class {
     color: #043F71;
 }
@@ -30,6 +40,18 @@ body {
 
 .logo-radius {
     border-radius: 8px;
+}
+
+/* Navigation link enhancements */
+.navbar-nav .nav-link {
+    color: var(--primary-color) !important;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.navbar-nav .nav-link.active,
+.navbar-nav .nav-link:hover {
+    color: var(--secondary-color) !important;
 }
 
 .card {
