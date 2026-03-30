@@ -121,19 +121,19 @@ class FundsManager {
             option.value = student.id;
             const lastThreeDigits = student.regNo.slice(-3);
             option.textContent = lastThreeDigits;
-            option.dataset.fullRegNo = student.regNo;
-            option.dataset.lastThree = lastThreeDigits;
             dropdown.appendChild(option);
-        });
-    }
-
-    filterStudentList(searchTerm) {
-        const dropdown = document.getElementById('income-student');
-        if (dropdown.appendChild(option);
         });
 
         // Reinitialize Tom Select after populating
-        this.initializeSelect(   const matchesSearch = transaction.description.toLowerCase().includes(searchTerm) ||
+        this.initializeSelect();
+    }
+
+    filterTransactions() {
+        const searchTerm = document.getElementById('search-input').value.toLowerCase();
+        const filterValue = document.getElementById('filter-select').value;
+
+        this.filteredTransactions = this.transactions.filter(transaction => {
+            const matchesSearch = transaction.description.toLowerCase().includes(searchTerm) ||
                                 (transaction.student && transaction.student.toLowerCase().includes(searchTerm)) ||
                                 transaction.addedBy.toLowerCase().includes(searchTerm);
 
