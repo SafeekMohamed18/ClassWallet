@@ -13,6 +13,22 @@ class FundsManager {
         this.loadData();
         this.setupEventListeners();
         this.setDefaultDates();
+        this.initializeSelect();
+    }
+
+    initializeSelect() {
+        // Initialize Tom Select for searchable dropdown
+        setTimeout(() => {
+            if (document.getElementById('income-student') && !this.tomSelectInitialized) {
+                new TomSelect('#income-student', {
+                    maxItems: 1,
+                    create: false,
+                    placeholder: 'Search student by last 3 digits...',
+                    searchField: 'text'
+                });
+                this.tomSelectInitialized = true;
+            }
+        }, 100);
     }
 
     setDefaultDates() {
@@ -92,21 +108,32 @@ class FundsManager {
         const dropdown = document.getElementById('income-student');
         if (!dropdown) return;
 
+        // Sort students by last 3 digits of registration number
+        const sortedStudents = [...this.students].sort((a, b) => {
+            const lastThreeA = a.regNo.slice(-3);
+            const lastThreeB = b.regNo.slice(-3);
+            return lastThreeA.localeCompare(lastThreeB);
+        });
+
         dropdown.innerHTML = '<option value="">Select student...</option>';
-        this.students.forEach(student => {
+        sortedStudents.forEach(student => {
             const option = document.createElement('option');
             option.value = student.id;
-            option.textContent = student.regNo;
+            const lastThreeDigits = student.regNo.slice(-3);
+            option.textContent = lastThreeDigits;
+            option.dataset.fullRegNo = student.regNo;
+            option.dataset.lastThree = lastThreeDigits;
             dropdown.appendChild(option);
         });
     }
 
-    filterTransactions() {
-        const searchTerm = document.getElementById('search-input').value.toLowerCase();
-        const filterValue = document.getElementById('filter-select').value;
+    filterStudentList(searchTerm) {
+        const dropdown = document.getElementById('income-student');
+        if (dropdown.appendChild(option);
+        });
 
-        this.filteredTransactions = this.transactions.filter(transaction => {
-            const matchesSearch = transaction.description.toLowerCase().includes(searchTerm) ||
+        // Reinitialize Tom Select after populating
+        this.initializeSelect(   const matchesSearch = transaction.description.toLowerCase().includes(searchTerm) ||
                                 (transaction.student && transaction.student.toLowerCase().includes(searchTerm)) ||
                                 transaction.addedBy.toLowerCase().includes(searchTerm);
 
