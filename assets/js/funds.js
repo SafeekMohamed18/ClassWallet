@@ -43,6 +43,14 @@ class FundsManager {
             });
         }
 
+        // Student search in modal
+        const studentSearchInput = document.getElementById('student-search-input');
+        if (studentSearchInput) {
+            studentSearchInput.addEventListener('input', () => {
+                this.filterStudentDropdown();
+            });
+        }
+
         // Add income form
         const saveIncomeBtn = document.getElementById('save-income-btn');
         if (saveIncomeBtn) {
@@ -97,7 +105,27 @@ class FundsManager {
             const option = document.createElement('option');
             option.value = student.id;
             option.textContent = `${student.name} (${student.regNo})`;
+            option.dataset.regNo = student.regNo.toLowerCase();
             dropdown.appendChild(option);
+        });
+    }
+
+    filterStudentDropdown() {
+        const searchTerm = document.getElementById('student-search-input').value.toLowerCase();
+        const dropdown = document.getElementById('income-student');
+        if (!dropdown) return;
+
+        const options = dropdown.querySelectorAll('option');
+        options.forEach((option, index) => {
+            if (index === 0) return; // Skip the "Select student" option
+
+            if (searchTerm === '') {
+                option.style.display = '';
+            } else {
+                const regNo = option.dataset.regNo || '';
+                const studentName = option.textContent.toLowerCase();
+                option.style.display = (regNo.includes(searchTerm) || studentName.includes(searchTerm)) ? '' : 'none';
+            }
         });
     }
 

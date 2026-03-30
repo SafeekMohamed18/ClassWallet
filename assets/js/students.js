@@ -14,7 +14,15 @@ class StudentsManager {
     }
 
     setupEventListeners() {
-        // Search functionality
+        // Enrollment number search
+        const enrollmentSearch = document.getElementById('enrollment-search');
+        if (enrollmentSearch) {
+            enrollmentSearch.addEventListener('input', () => {
+                this.filterStudents();
+            });
+        }
+
+        // General search functionality
         const searchInput = document.getElementById('search-input');
         if (searchInput) {
             searchInput.addEventListener('input', () => {
@@ -67,10 +75,17 @@ class StudentsManager {
     }
 
     filterStudents() {
+        const enrollmentSearch = document.getElementById('enrollment-search').value.toLowerCase();
         const searchTerm = document.getElementById('search-input').value.toLowerCase();
         const filterValue = document.getElementById('filter-select').value;
 
         this.filteredStudents = this.students.filter(student => {
+            // If enrollment number search is used, prioritize that
+            if (enrollmentSearch) {
+                return student.regNo.toLowerCase().includes(enrollmentSearch);
+            }
+
+            // Otherwise use general search
             const matchesSearch = student.name.toLowerCase().includes(searchTerm) ||
                                 student.regNo.toLowerCase().includes(searchTerm) ||
                                 student.email.toLowerCase().includes(searchTerm);
