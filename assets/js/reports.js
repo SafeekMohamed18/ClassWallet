@@ -577,7 +577,7 @@ class ReportsManager {
         const report = this.reports.find(r => r.id === id);
         if (report) {
             // In real app, trigger download
-            alert(`Downloading ${report.name}`);
+            window.showToast(`Downloading ${report.name}`, 'info');
         }
     }
 
@@ -607,11 +607,11 @@ class ReportsManager {
     }
 
     showSuccess(message) {
-        alert(message);
+        window.showToast(message, 'success');
     }
 
     showError(message) {
-        alert(message);
+        window.showToast(message, 'danger');
     }
 }
 

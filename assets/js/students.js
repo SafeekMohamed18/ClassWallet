@@ -171,19 +171,22 @@ class StudentsManager {
         const student = this.students.find(s => s.id === id);
         if (!student) return;
 
-        // Create a simple view modal or redirect to detail page
-        // For now, just show an alert with details
-        alert(`Student Details:
-Name: ${student.name}
-Reg No: ${student.regNo}
-Mobile: ${student.mobile || 'N/A'}
-Email: ${student.email || 'N/A'}
-Address: ${student.address || 'N/A'}
-Guardian Name: ${student.guardianName || 'N/A'}
-Guardian Mobile: ${student.guardianMobile || 'N/A'}
-Birthday: ${student.birthday || 'N/A'}
-Race: ${student.race || 'N/A'}
-Notes: ${student.notes || 'N/A'}`);
+        const details = `
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><strong>Name:</strong> ${student.name}</li>
+                <li class="list-group-item"><strong>Reg No:</strong> ${student.regNo}</li>
+                <li class="list-group-item"><strong>Mobile:</strong> ${student.mobile || 'N/A'}</li>
+                <li class="list-group-item"><strong>Email:</strong> ${student.email || 'N/A'}</li>
+                <li class="list-group-item"><strong>Address:</strong> ${student.address || 'N/A'}</li>
+                <li class="list-group-item"><strong>Guardian Name:</strong> ${student.guardianName || 'N/A'}</li>
+                <li class="list-group-item"><strong>Guardian Mobile:</strong> ${student.guardianMobile || 'N/A'}</li>
+                <li class="list-group-item"><strong>Birthday:</strong> ${student.birthday || 'N/A'}</li>
+                <li class="list-group-item"><strong>Race:</strong> ${student.race || 'N/A'}</li>
+                <li class="list-group-item"><strong>Notes:</strong> ${student.notes || 'N/A'}</li>
+            </ul>
+        `;
+
+        window.showInfoModal('Student Details', details);
     }
 
     editStudent(id) {
@@ -365,12 +368,11 @@ Notes: ${student.notes || 'N/A'}`);
     }
 
     showSuccess(message) {
-        // Simple success message - could be enhanced with toast notifications
-        alert(message);
+        window.showToast(message, 'success');
     }
 
     showError(message) {
-        alert(message);
+        window.showToast(message, 'danger');
     }
 }
 

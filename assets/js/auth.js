@@ -74,7 +74,7 @@ class AuthManager {
             this.updateUI();
             this.saveSession();
         } else {
-            this.showError('Access Denied: This email is not authorized.');
+            window.showToast('Access Denied: This email is not authorized.', 'danger');
         }
     }
 

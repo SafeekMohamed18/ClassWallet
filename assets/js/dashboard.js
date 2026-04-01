@@ -233,9 +233,8 @@ class DashboardManager {
     }
 
     showError(message) {
-        // Simple error display - could be enhanced with toast notifications
         console.error(message);
-        alert(message);
+        window.showToast(message, 'danger');
     }
 }
 

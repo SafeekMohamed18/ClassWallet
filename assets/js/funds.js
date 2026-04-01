@@ -411,12 +411,11 @@ class FundsManager {
     }
 
     showSuccess(message) {
-        // Simple success message - could be enhanced with toast notifications
-        alert(message);
+        window.showToast(message, 'success');
     }
 
     showError(message) {
-        alert(message);
+        window.showToast(message, 'danger');
     }
 }
 
