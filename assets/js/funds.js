@@ -6,6 +6,7 @@ class FundsManager {
         this.transactions = [];
         this.filteredTransactions = [];
         this.students = [];
+        this.tomSelectInstance = null;
         this.init();
     }
 
@@ -13,20 +14,23 @@ class FundsManager {
         this.loadData();
         this.setupEventListeners();
         this.setDefaultDates();
-        this.initializeSelect();
     }
 
     initializeSelect() {
         // Initialize Tom Select for searchable dropdown
         setTimeout(() => {
-            if (document.getElementById('income-student') && !this.tomSelectInitialized) {
-                new TomSelect('#income-student', {
+            const element = document.getElementById('income-student');
+            if (element) {
+                // Destroy existing instance if it exists
+                if (this.tomSelectInstance) {
+                    this.tomSelectInstance.destroy();
+                }
+                this.tomSelectInstance = new TomSelect('#income-student', {
                     maxItems: 1,
                     create: false,
-                    placeholder: 'Search student by last 3 digits...',
+                    placeholder: 'Search student by registration number...',
                     searchField: 'text'
                 });
-                this.tomSelectInitialized = true;
             }
         }, 100);
     }
@@ -108,19 +112,16 @@ class FundsManager {
         const dropdown = document.getElementById('income-student');
         if (!dropdown) return;
 
-        // Sort students by last 3 digits of registration number
+        // Sort students by registration number
         const sortedStudents = [...this.students].sort((a, b) => {
-            const lastThreeA = a.regNo.slice(-3);
-            const lastThreeB = b.regNo.slice(-3);
-            return lastThreeA.localeCompare(lastThreeB);
+            return a.regNo.localeCompare(b.regNo);
         });
 
         dropdown.innerHTML = '<option value="">Select student...</option>';
         sortedStudents.forEach(student => {
             const option = document.createElement('option');
             option.value = student.id;
-            const lastThreeDigits = student.regNo.slice(-3);
-            option.textContent = lastThreeDigits;
+            option.textContent = student.regNo;
             dropdown.appendChild(option);
         });
 
