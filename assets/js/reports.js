@@ -6,7 +6,29 @@ class ReportsManager {
         this.incomeChart = null;
         this.expenseChart = null;
         this.reports = [];
+        this.cacheExpiry = 5 * 60 * 1000; // 5 minutes
         this.init();
+    }
+
+    // Cache utility functions
+    setCache(key, data) {
+        const cacheData = {
+            data: data,
+            timestamp: Date.now()
+        };
+        localStorage.setItem(key, JSON.stringify(cacheData));
+    }
+
+    getCache(key) {
+        const cached = localStorage.getItem(key);
+        if (!cached) return null;
+        
+        const cacheData = JSON.parse(cached);
+        if (Date.now() - cacheData.timestamp > this.cacheExpiry) {
+            localStorage.removeItem(key);
+            return null;
+        }
+        return cacheData.data;
     }
 
     init() {
@@ -53,19 +75,34 @@ class ReportsManager {
 
     async loadReportData() {
         try {
+            // Load cached data first
+            const cachedStats = this.getCache('dashboardData');
+            const cachedTransactions = this.getCache('recentTransactions');
+            
+            if (cachedStats) {
+                this.updateStats(cachedStats);
+            }
+            if (cachedTransactions) {
+                this.updateCharts({ transactions: cachedTransactions });
+            }
+
             // Load summary stats
             const stats = await this.fetchStats();
+            this.setCache('dashboardData', stats);
             this.updateStats(stats);
 
             // Load chart data
             const chartData = await this.fetchChartData();
+            this.setCache('recentTransactions', chartData);
             this.updateCharts(chartData);
 
             // Load recent reports
             this.loadRecentReports();
         } catch (error) {
             console.error('Error loading report data:', error);
-            this.showError('Failed to load report data');
+            if (!cachedStats && !cachedTransactions) {
+                this.showError('Failed to load report data');
+            }
         }
     }
 

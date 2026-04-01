@@ -7,7 +7,29 @@ class FundsManager {
         this.filteredTransactions = [];
         this.students = [];
         this.tomSelectInstance = null;
+        this.cacheExpiry = 5 * 60 * 1000; // 5 minutes
         this.init();
+    }
+
+    // Cache utility functions
+    setCache(key, data) {
+        const cacheData = {
+            data: data,
+            timestamp: Date.now()
+        };
+        localStorage.setItem(key, JSON.stringify(cacheData));
+    }
+
+    getCache(key) {
+        const cached = localStorage.getItem(key);
+        if (!cached) return null;
+        
+        const cacheData = JSON.parse(cached);
+        if (Date.now() - cacheData.timestamp > this.cacheExpiry) {
+            localStorage.removeItem(key);
+            return null;
+        }
+        return cacheData.data;
     }
 
     init() {
@@ -83,16 +105,42 @@ class FundsManager {
     async loadData() {
         try {
             // Load students for the income student dropdown
-            this.students = await this.fetchStudents();
-            this.populateStudentDropdown();
+            const cachedStudents = this.getCache('students');
+            if (cachedStudents) {
+                this.students = cachedStudents;
+                this.populateStudentDropdown();
+            }
 
             // Load transactions
-            this.transactions = await this.fetchTransactions();
+            const cachedTransactions = this.getCache('transactions');
+            if (cachedTransactions) {
+                this.transactions = cachedTransactions;
+                this.filteredTransactions = [...this.transactions];
+                this.renderTransactions();
+            }
+
+            // Fetch fresh data in background
+            const [students, transactions] = await Promise.all([
+                this.fetchStudents(),
+                this.fetchTransactions()
+            ]);
+
+            this.students = students;
+            this.transactions = transactions;
             this.filteredTransactions = [...this.transactions];
+
+            // Update cache
+            this.setCache('students', students);
+            this.setCache('transactions', transactions);
+
+            // Update UI with fresh data
+            this.populateStudentDropdown();
             this.renderTransactions();
         } catch (error) {
             console.error('Error loading funds data:', error);
-            this.showError('Failed to load funds data');
+            if (!this.students.length && !this.transactions.length) {
+                this.showError('Failed to load funds data');
+            }
         }
     }
 

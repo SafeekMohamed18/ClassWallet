@@ -4,7 +4,29 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbzHbdwhN1bwCsGDn5gFjne1
 class DashboardManager {
     constructor() {
         this.chart = null;
+        this.cacheExpiry = 5 * 60 * 1000; // 5 minutes
         this.init();
+    }
+
+    // Cache utility functions
+    setCache(key, data) {
+        const cacheData = {
+            data: data,
+            timestamp: Date.now()
+        };
+        localStorage.setItem(key, JSON.stringify(cacheData));
+    }
+
+    getCache(key) {
+        const cached = localStorage.getItem(key);
+        if (!cached) return null;
+        
+        const cacheData = JSON.parse(cached);
+        if (Date.now() - cacheData.timestamp > this.cacheExpiry) {
+            localStorage.removeItem(key);
+            return null;
+        }
+        return cacheData.data;
     }
 
     init() {
@@ -22,6 +44,22 @@ class DashboardManager {
     }
 
     async loadDashboardData() {
+        const cacheKey = 'dashboardData';
+        const cachedData = this.getCache(cacheKey);
+        
+        // Show cached data immediately if available
+        if (cachedData) {
+            this.updateSummaryCards(cachedData);
+            this.updateChart(cachedData.chartData || { labels: [], income: [], expenses: [] });
+            this.updateMonthlyOverview(cachedData);
+            
+            const cachedTransactions = this.getCache('recentTransactions');
+            if (cachedTransactions) {
+                this.updateRecentTransactions(cachedTransactions);
+            }
+        }
+
+        // Fetch fresh data in background
         try {
             // Fetch all dashboard data in one call
             const response = await fetch(`${API_URL}?action=getDashboardData`);
@@ -29,17 +67,23 @@ class DashboardManager {
             if (!result.success) throw new Error(result.error);
             const data = result.data;
 
-            // Update all dashboard components
+            // Update cache
+            this.setCache(cacheKey, data);
+
+            // Update UI with fresh data
             this.updateSummaryCards(data);
             this.updateChart(data.chartData || { labels: [], income: [], expenses: [] });
             this.updateMonthlyOverview(data);
 
             // Fetch and update recent transactions (separate endpoint)
             const transactions = await this.fetchRecentTransactions();
+            this.setCache('recentTransactions', transactions);
             this.updateRecentTransactions(transactions);
         } catch (error) {
             console.error('Error loading dashboard data:', error);
-            this.showError('Failed to load dashboard data');
+            if (!cachedData) {
+                this.showError('Failed to load dashboard data');
+            }
         }
     }
 

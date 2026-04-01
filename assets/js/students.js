@@ -5,7 +5,29 @@ class StudentsManager {
     constructor() {
         this.students = [];
         this.filteredStudents = [];
+        this.cacheExpiry = 5 * 60 * 1000; // 5 minutes
         this.init();
+    }
+
+    // Cache utility functions
+    setCache(key, data) {
+        const cacheData = {
+            data: data,
+            timestamp: Date.now()
+        };
+        localStorage.setItem(key, JSON.stringify(cacheData));
+    }
+
+    getCache(key) {
+        const cached = localStorage.getItem(key);
+        if (!cached) return null;
+        
+        const cacheData = JSON.parse(cached);
+        if (Date.now() - cacheData.timestamp > this.cacheExpiry) {
+            localStorage.removeItem(key);
+            return null;
+        }
+        return cacheData.data;
     }
 
     init() {
@@ -57,13 +79,28 @@ class StudentsManager {
 
     async loadStudents() {
         try {
-            // Mock data - replace with actual API call to Google Sheets
-            this.students = await this.fetchStudents();
+            const cachedStudents = this.getCache('students');
+            if (cachedStudents) {
+                this.students = cachedStudents;
+                this.filteredStudents = [...this.students];
+                this.renderStudents();
+            }
+
+            // Fetch fresh data in background
+            const students = await this.fetchStudents();
+            this.students = students;
             this.filteredStudents = [...this.students];
+
+            // Update cache
+            this.setCache('students', students);
+
+            // Update UI with fresh data
             this.renderStudents();
         } catch (error) {
             console.error('Error loading students:', error);
-            this.showError('Failed to load students: ' + error.message);
+            if (!this.students.length) {
+                this.showError('Failed to load students: ' + error.message);
+            }
         }
     }
 
