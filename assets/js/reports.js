@@ -582,11 +582,19 @@ class ReportsManager {
     }
 
     deleteReport(id) {
-        if (confirm('Are you sure you want to delete this report?')) {
-            this.reports = this.reports.filter(r => r.id !== id);
-            this.renderRecentReports();
-            this.showSuccess('Report deleted successfully');
-        }
+        window.showConfirmModal(
+            'Confirm Delete',
+            'Are you sure you want to delete this report?',
+            () => {
+                this.reports = this.reports.filter(r => r.id !== id);
+                this.renderRecentReports();
+                this.showSuccess('Report deleted successfully');
+            },
+            {
+                confirmText: 'Delete',
+                cancelText: 'Cancel'
+            }
+        );
     }
 
     async downloadPDF() {

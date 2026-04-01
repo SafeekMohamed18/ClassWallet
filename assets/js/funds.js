@@ -357,24 +357,30 @@ class FundsManager {
     }
 
     async deleteTransaction(id) {
-        if (!confirm('Are you sure you want to delete this transaction?')) {
-            return;
-        }
+        window.showConfirmModal(
+            'Confirm Delete',
+            'Are you sure you want to delete this transaction?',
+            async () => {
+                try {
+                    // Mock API call - replace with actual delete from Google Sheets
+                    await this.deleteTransactionFromAPI(id);
 
-        try {
-            // Mock API call - replace with actual delete from Google Sheets
-            await this.deleteTransactionFromAPI(id);
+                    // Remove from local data
+                    this.transactions = this.transactions.filter(t => t.id !== id);
+                    this.filteredTransactions = [...this.transactions];
+                    this.renderTransactions();
 
-            // Remove from local data
-            this.transactions = this.transactions.filter(t => t.id !== id);
-            this.filteredTransactions = [...this.transactions];
-            this.renderTransactions();
-
-            this.showSuccess('Transaction deleted successfully');
-        } catch (error) {
-            console.error('Error deleting transaction:', error);
-            this.showError('Failed to delete transaction');
-        }
+                    this.showSuccess('Transaction deleted successfully');
+                } catch (error) {
+                    console.error('Error deleting transaction:', error);
+                    this.showError('Failed to delete transaction');
+                }
+            },
+            {
+                confirmText: 'Delete',
+                cancelText: 'Cancel'
+            }
+        );
     }
 
     // Mock API methods - replace with actual Google Apps Script calls

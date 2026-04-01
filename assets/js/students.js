@@ -312,24 +312,30 @@ class StudentsManager {
     }
 
     async deleteStudent(id) {
-        if (!confirm('Are you sure you want to delete this student?')) {
-            return;
-        }
+        window.showConfirmModal(
+            'Confirm Delete',
+            'Are you sure you want to delete this student?',
+            async () => {
+                try {
+                    // Mock API call - replace with actual delete from Google Sheets
+                    await this.deleteStudentFromAPI(id);
 
-        try {
-            // Mock API call - replace with actual delete from Google Sheets
-            await this.deleteStudentFromAPI(id);
+                    // Remove from local data
+                    this.students = this.students.filter(s => s.id !== id);
+                    this.filteredStudents = [...this.students];
+                    this.renderStudents();
 
-            // Remove from local data
-            this.students = this.students.filter(s => s.id !== id);
-            this.filteredStudents = [...this.students];
-            this.renderStudents();
-
-            this.showSuccess('Student deleted successfully');
-        } catch (error) {
-            console.error('Error deleting student:', error);
-            this.showError('Failed to delete student');
-        }
+                    this.showSuccess('Student deleted successfully');
+                } catch (error) {
+                    console.error('Error deleting student:', error);
+                    this.showError('Failed to delete student');
+                }
+            },
+            {
+                confirmText: 'Delete',
+                cancelText: 'Cancel'
+            }
+        );
     }
 
     // Mock API methods - replace with actual Google Apps Script calls
